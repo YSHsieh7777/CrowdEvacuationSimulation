@@ -1,4 +1,4 @@
-#include "person.hpp"
+#include "simulator/person.hpp"
 
 std::map<uint8_t, uint8_t> panic_to_red = {{0, 0}, {1, 255}};
 std::map<uint8_t, uint8_t> panic_to_green = {{0, 0}, {1, 0}};

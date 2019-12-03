@@ -1,4 +1,4 @@
-#include "window_map.hpp"
+#include "simulator/window_map.hpp"
 
 WindowMap::WindowMap()
 {

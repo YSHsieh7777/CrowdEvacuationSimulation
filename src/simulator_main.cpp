@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "simulator/simulator.hpp"
 
 int main( int argc, char* args[] )
 {
