@@ -24,6 +24,8 @@ const float & Person::x() const { return m_x; }
 float & Person::x() { return m_x; }
 const float & Person::y() const { return m_y; }
 float & Person::y() { return m_y; }
+const float & Person::r() const { return m_radius; }
+float & Person::r() { return m_radius; }
 const float & Person::x_speed() const { return m_x_speed; }
 float & Person::x_speed() { return m_x_speed; }
 const float & Person::y_speed() const { return m_y_speed; }

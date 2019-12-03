@@ -57,6 +57,8 @@ WindowMap::WindowMap()
 
 WindowMap::~WindowMap()
 {
+	delete_people();
+
 	//Destroy window	
 	SDL_DestroyRenderer( gRenderer );
 	SDL_DestroyWindow( gWindow );
@@ -140,187 +142,47 @@ const std::vector<SDL_Rect> & WindowMap::walls() const
 
 void WindowMap::init_people()
 {
-	for(uint8_t y=1; y<7; ++y)
-	{
-		for(uint8_t x=1; x<7; ++x)
-		{	
-			float rand_x = x*25 + (17.5 - 7.5) * rand() / (RAND_MAX + 1.0) + 7.5;
-			float rand_y = y*25 + (17.5 - 7.5) * rand() / (RAND_MAX + 1.0) + 7.5;
-			
-			Person lu_p(80 + rand_x, 80 + rand_y, 7.5);
-			lu_people.push_back(lu_p);
-			Person ru_p(310 + rand_x, 80 + rand_y, 7.5);
-			ru_people.push_back(ru_p);
-			Person ld_p(80 + rand_x, 310 + rand_y, 7.5);
-			ld_people.push_back(ld_p);
-			Person rd_p(310 + rand_x, 310 + rand_y, 7.5);
-			rd_people.push_back(rd_p);
-		}
-	}		
+	lu_people = new MapBlock(80, 280, 80, 280, 7, 7, true, true, false, true);
+	ld_people = new MapBlock(80, 280, 310, 510, 7, 7, false, true, true, false);
+	ru_people = new MapBlock(310, 510, 80, 280, 7, 7, true, false, false, true);
+	rd_people = new MapBlock(310, 510, 310, 510, 7, 7, true, false, true, true);
+	lu_people->add_neighbors(NULL, ru_people, NULL, ld_people);
+	ld_people->add_neighbors(NULL, rd_people, lu_people, NULL);
+	ru_people->add_neighbors(lu_people, NULL, NULL, rd_people);
+	rd_people->add_neighbors(ld_people, NULL, ru_people, NULL);
 }
 
-void WindowMap::update_lu_people_speed()
+void WindowMap::delete_people()
 {
-	size_t lu_size = lu_people.size();
-	
-	for(size_t i=0; i<lu_size; ++i)
-	{	
-		if(lu_people[i].pass_door())
-		{
-			lu_people[i].x_speed() = lu_people[i].x_next_speed();
-			lu_people[i].y_speed() = lu_people[i].y_next_speed();
-		}	
-		else 
-		{
-			lu_people[i].x_speed() = lu_people[i].x_next_speed() + rand() / (RAND_MAX + 1.0) - 0.5;
-			lu_people[i].y_speed() = lu_people[i].y_next_speed() + rand() / (RAND_MAX + 1.0) - 0.5;
-		}	
-	}
-}
-
-void WindowMap::check_lu_walls_collision()
-{
-	size_t lu_size = lu_people.size();
-	
-	for(size_t i=0; i<lu_size; ++i)
-	{
-		float move_x_pos = lu_people[i].x() + lu_people[i].x_speed();
-		float move_y_pos = lu_people[i].y() + lu_people[i].y_speed();
-
-		if((move_x_pos-7.5) < 80 && ((move_y_pos-7.5) < 170 || (move_y_pos+7.5) > 190))
-		{
-			lu_people[i].x_speed() =  -(lu_people[i].x() - 80 - 7.5);
-			lu_people[i].x_next_speed() = 0;
-		}
-		else if((move_x_pos-7.5) < 80 && ((move_y_pos-7.5) >= 170 || (move_y_pos+7.5) <= 190))
-		{
-			lu_people[i].y_next_speed() = 0;
-			lu_people[i].pass_door() = true;
-		}	
-		else if((move_x_pos+7.5) > 280 && ((move_y_pos-7.5) < 170 || (move_y_pos+7.5) > 190))
-		{
-			lu_people[i].x_speed() =  280 - lu_people[i].x() - 7.5;
-			lu_people[i].x_next_speed() = 0;
-		}
-		else if((move_x_pos+7.5) > 280 && ((move_y_pos-7.5) >= 170 && (move_y_pos+7.5) <= 190))
-		{
-			lu_people[i].y_next_speed() = 0;
-			lu_people[i].pass_door() = true;
-		}
-			
-		if((move_y_pos-7.5) < 80)
-		{
-			lu_people[i].y_speed() =  -(lu_people[i].y() - 80 - 7.5);
-			lu_people[i].y_next_speed() = 0;
-		}	
-		else if((move_y_pos+7.5) > 280 && ((move_x_pos-7.5) < 170 || (move_x_pos+7.5) > 190))
-		{
-			lu_people[i].y_speed() =  280 - lu_people[i].y() - 7.5;
-			lu_people[i].y_next_speed() = 0;
-		}
-		else if((move_y_pos+7.5) > 280 && ((move_x_pos-7.5) >= 170 || (move_x_pos+7.5) <= 190))
-		{
-			lu_people[i].x_speed() = 0;
-			lu_people[i].pass_door() = true;
-		}
-
-		if((move_x_pos-7.5) > 310)
-		{
-			ru_people.push_back(lu_people[i]);
-			lu_people.erase(lu_people.begin()+i);
-		}
-		else if((move_y_pos-7.5) > 310)
-		{
-			ld_people.push_back(lu_people[i]);
-			lu_people.erase(lu_people.begin()+i);
-		}
-	}
-}
-
-void WindowMap::check_lu_person_collision(size_t num)
-{
-	float cur_move_x_pos = lu_people[num].x() + lu_people[num].x_speed();
-	float cur_move_y_pos = lu_people[num].y() + lu_people[num].y_speed();
-
-	size_t lu_size = lu_people.size();
-
-	for(size_t i=0; i<lu_size; ++i)
-	{
-		float move_x_pos = lu_people[i].x() + lu_people[i].x_speed();
-		float move_y_pos = lu_people[i].y() + lu_people[i].y_speed();
-
-		if(i == num)
-			continue;
-		else
-		{
-			if((abs(cur_move_x_pos-move_x_pos) < 15) && (abs(cur_move_y_pos-move_y_pos) < 15))
-			{
-				lu_people[num].x_speed() = 0;
-				lu_people[num].y_speed() = 0;
-				lu_people[i].x_speed() = 0;
-				lu_people[i].y_speed() = 0;
-				lu_people[num].x_next_speed() = lu_people[num].x_next_speed() + (cur_move_x_pos-move_x_pos) * 0.01;
-				lu_people[num].y_next_speed() = lu_people[num].y_next_speed() + (cur_move_y_pos-move_y_pos) * 0.01;
-				lu_people[i].x_next_speed() = lu_people[i].x_next_speed() + (move_x_pos-cur_move_x_pos) * 0.01;
-				lu_people[i].y_next_speed() = lu_people[i].y_next_speed() + (move_y_pos-cur_move_y_pos) * 0.01;
-				check_lu_person_collision(i);
-				check_lu_person_collision(num);
-				break;
-			}
-		}	
-	}
-}
-
-void WindowMap::check_lu_people_collision()
-{
-	size_t lu_size = lu_people.size();
-	
-	for(size_t i=0; i<lu_size; ++i)
-	{
-		check_lu_person_collision(i);
-	}
-}
-
-void WindowMap::update_lu_people()
-{
-	check_lu_walls_collision();
-	check_lu_people_collision();
-	
-	size_t lu_size = lu_people.size();
-	
-	for(size_t i=0; i<lu_size; ++i)
-	{
-		lu_people[i].move();
-	}
-
-	// for(size_t i=0; i<lu_size; ++i)
-	// {
-	// 	std::cout << "person " << i << "  x: " << lu_people[i].x() << "  y: " << lu_people[i].y() << "\n";
-	// }
-	
-	update_lu_people_speed();
+	delete lu_people;
+	delete ld_people;
+	delete ru_people;
+	delete rd_people;
 }
 
 void WindowMap::update_people()
 {
-	update_lu_people();
+	lu_people->update_people();
+	ru_people->update_people();
+	ld_people->update_people();
+	rd_people->update_people();
 }
 
 void WindowMap::rander_people()
 {
-	size_t lu_size = lu_people.size();
-	size_t ru_size = ru_people.size();
-	size_t ld_size = ld_people.size();
-	size_t rd_size = rd_people.size();
+	size_t lu_size = lu_people->people_num();
+	size_t ru_size = ru_people->people_num();
+	size_t ld_size = ld_people->people_num();
+	size_t rd_size = rd_people->people_num();
 
 	for(size_t i=0; i<lu_size; ++i)
-		lu_people[i].render(gRenderer);
+		lu_people->people()[i].render(gRenderer);
 	for(size_t i=0; i<ru_size; ++i)
-		ru_people[i].render(gRenderer);
+		ru_people->people()[i].render(gRenderer);
 	for(size_t i=0; i<ld_size; ++i)
-		ld_people[i].render(gRenderer);
+		ld_people->people()[i].render(gRenderer);
 	for(size_t i=0; i<rd_size; ++i)
-		rd_people[i].render(gRenderer);
+		rd_people->people()[i].render(gRenderer);
 }
 
 void WindowMap::update_screen()

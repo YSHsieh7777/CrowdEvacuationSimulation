@@ -7,7 +7,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "person.hpp"
+#include "map_block.hpp"
 
 class WindowMap
 {
@@ -17,13 +17,9 @@ public:
 
     void init_walls();   
     const std::vector<SDL_Rect> & walls() const;
-    void init_people();
 
-    void update_lu_people_speed();
-    void check_lu_walls_collision();
-    void check_lu_person_collision(size_t );
-    void check_lu_people_collision();
-    void update_lu_people();
+    void init_people();
+    void delete_people();
     void update_people();
     void update_screen();
     void rander_people();
@@ -32,11 +28,11 @@ private:
     SDL_Renderer* gRenderer;
     SDL_Window* gWindow;
 	std::vector<SDL_Rect> m_walls;
-	std::vector<Person> lu_people;
-    std::vector<Person> ld_people;
-    std::vector<Person> ru_people;
-    std::vector<Person> rd_people;
+	MapBlock *lu_people;
+    MapBlock *ld_people;
+    MapBlock *ru_people;
+    MapBlock *rd_people;
 
-    const uint16_t SCREEN_WIDTH = 590;
-    const uint16_t SCREEN_HEIGHT = 590;
+    const size_t SCREEN_WIDTH = 590;
+    const size_t SCREEN_HEIGHT = 590;
 };

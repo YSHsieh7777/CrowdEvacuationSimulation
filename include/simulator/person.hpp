@@ -16,6 +16,8 @@ public:
     float & x();
     const float & y() const;
     float & y();
+	const float & r() const;
+    float & r();
 	const float & x_speed() const;
     float & x_speed();
     const float & y_speed() const;
