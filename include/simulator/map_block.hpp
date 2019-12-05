@@ -17,8 +17,8 @@ public:
 
     const size_t & people_num() const;
     size_t & people_num();
-    const std::vector<Person> & people() const;
-    std::vector<Person> & people();
+    const std::vector<Person* > & people() const;
+    std::vector<Person* > & people();
 
     void init_people();
 
@@ -31,7 +31,7 @@ public:
     void add_neighbors(MapBlock* , MapBlock* , MapBlock* , MapBlock* );
 
 private:
-	std::vector<Person> m_people;
+	std::vector<Person *> m_people;
 
     size_t m_left_bound;
     size_t m_right_bound;

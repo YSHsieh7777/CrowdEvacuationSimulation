@@ -176,13 +176,13 @@ void WindowMap::rander_people()
 	size_t rd_size = rd_people->people_num();
 
 	for(size_t i=0; i<lu_size; ++i)
-		lu_people->people()[i].render(gRenderer);
+		lu_people->people()[i]->render(gRenderer);
 	for(size_t i=0; i<ru_size; ++i)
-		ru_people->people()[i].render(gRenderer);
+		ru_people->people()[i]->render(gRenderer);
 	for(size_t i=0; i<ld_size; ++i)
-		ld_people->people()[i].render(gRenderer);
+		ld_people->people()[i]->render(gRenderer);
 	for(size_t i=0; i<rd_size; ++i)
-		rd_people->people()[i].render(gRenderer);
+		rd_people->people()[i]->render(gRenderer);
 }
 
 void WindowMap::update_screen()
