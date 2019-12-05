@@ -142,10 +142,10 @@ const std::vector<SDL_Rect> & WindowMap::walls() const
 
 void WindowMap::init_people()
 {
-	lu_people = new MapBlock(80, 280, 80, 280, 7, 7, true, true, false, true);
-	ld_people = new MapBlock(80, 280, 310, 510, 7, 7, false, true, true, false);
-	ru_people = new MapBlock(310, 510, 80, 280, 7, 7, true, false, false, true);
-	rd_people = new MapBlock(310, 510, 310, 510, 7, 7, true, false, true, true);
+	lu_people = new MapBlock(80, 280, 80, 280, 5, 5, true, true, false, true);
+	ld_people = new MapBlock(80, 280, 310, 510, 5, 5, false, true, true, false);
+	ru_people = new MapBlock(310, 510, 80, 280, 5, 5, true, false, false, true);
+	rd_people = new MapBlock(310, 510, 310, 510, 5, 5, true, false, true, true);
 	lu_people->add_neighbors(NULL, ru_people, NULL, ld_people);
 	ld_people->add_neighbors(NULL, rd_people, lu_people, NULL);
 	ru_people->add_neighbors(lu_people, NULL, NULL, rd_people);

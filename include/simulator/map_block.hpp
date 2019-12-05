@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
-#include <cmath>
+#include <math.h>
 #include <iostream>
 
 #include "person.hpp"
@@ -48,4 +48,6 @@ private:
     MapBlock *m_r_neighbor = NULL;
     MapBlock *m_u_neighbor = NULL;
     MapBlock *m_d_neighbor = NULL;
+
+    float m_average_x, m_average_y;
 };
