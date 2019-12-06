@@ -8,14 +8,14 @@ Person::Person(float x, float y , float r)
 {
     m_x = x;
     m_y = y;
-	m_radius = r;
-	m_x_speed = rand() / (RAND_MAX + 1.0) - 0.5;
+    m_radius = r;
+    m_x_speed = rand() / (RAND_MAX + 1.0) - 0.5;
     m_y_speed = rand() / (RAND_MAX + 1.0) - 0.5;
     m_x_next_speed = m_y_speed;
     m_y_next_speed = m_y_speed;
 
     m_panic_degree = 0;
-	m_moving_distance_last_few_seconds = 0;  // A factor that affects panic_degree.
+    m_moving_distance_last_few_seconds = 0;  // A factor that affects panic_degree.
     m_dead = false;  
     m_pass_door = false;
 }

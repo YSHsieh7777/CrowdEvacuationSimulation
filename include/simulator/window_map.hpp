@@ -16,19 +16,19 @@ public:
     ~WindowMap();
 
     void init_walls();   
-    const std::vector<SDL_Rect> & walls() const;
 
     void init_people();
     void delete_people();
-    void update_people();
+    void update_people(); 
+    void render_people();
+
     void update_screen();
-    void rander_people();
 
 private:
     SDL_Renderer* gRenderer;
     SDL_Window* gWindow;
-	std::vector<SDL_Rect> m_walls;
-	MapBlock *lu_people;
+    std::vector<SDL_Rect> m_walls;
+    MapBlock *lu_people;
     MapBlock *ld_people;
     MapBlock *ru_people;
     MapBlock *rd_people;
