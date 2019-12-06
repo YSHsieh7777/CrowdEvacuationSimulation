@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "map_block.hpp"
+#include "fire.hpp"
 
 class WindowMap
 {
@@ -16,11 +17,15 @@ public:
     ~WindowMap();
 
     void init_walls();   
+    void init_map_block();
+    void init_fire();
 
-    void init_people();
-    void delete_people();
+    void delete_map();
     void update_people(); 
     void render_people();
+    void render_fire();
+    void update_fire();
+    void check_fire_collision();
 
     void update_screen();
 
@@ -28,10 +33,13 @@ private:
     SDL_Renderer* gRenderer;
     SDL_Window* gWindow;
     std::vector<SDL_Rect> m_walls;
-    MapBlock *lu_people;
-    MapBlock *ld_people;
-    MapBlock *ru_people;
-    MapBlock *rd_people;
+    MapBlock *lu_block;
+    MapBlock *ld_block;
+    MapBlock *ru_block;
+    MapBlock *rd_block;
+
+    std::vector<Fire *> m_fire;
+    uint32_t count;
 
     const size_t SCREEN_WIDTH = 590;
     const size_t SCREEN_HEIGHT = 590;

@@ -26,13 +26,16 @@ public:
     void check_walls_collision();
     void check_person_collision(size_t );
     void check_people_collision();
+    void check_fire_collision(size_t , size_t , size_t );
     void people_move();
-    void update_people();
+    void update_fire();
+    void update_map_block();
 
     void add_neighbors(MapBlock* , MapBlock* , MapBlock* , MapBlock* );
 
 private:
     std::vector<Person *> m_people;
+    std::vector<Person *> m_dead_people;
 
     size_t m_left_bound;
     size_t m_right_bound;

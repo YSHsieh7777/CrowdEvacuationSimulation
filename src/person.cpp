@@ -36,6 +36,8 @@ const float & Person::y_next_speed() const { return m_y_next_speed; }
 float & Person::y_next_speed() { return m_y_next_speed; }
 const bool & Person::pass_door() const { return m_pass_door; }
 bool & Person::pass_door() { return m_pass_door; }
+const bool & Person::is_dead() const { return m_dead; }
+bool & Person::is_dead() { return m_dead; }
 
 void Person::move()
 {

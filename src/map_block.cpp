@@ -22,19 +22,23 @@ MapBlock::MapBlock(size_t left_bound, size_t right_bound, size_t up_bound,
             Person *p = new Person(m_left_bound + rand_x_pos, m_up_bound + rand_y_pos, 7.5);
             m_people.push_back(p);
         }
-    }    
+    }
 
     // Init a random average speed in a block
     // People in the block will move depending on that speed
     m_average_x = 0.4 * rand() / (RAND_MAX + 1.0) - 0.2;
-    m_average_y = 0.4 * rand() / (RAND_MAX + 1.0) - 0.2;    
+    m_average_y = 0.4 * rand() / (RAND_MAX + 1.0) - 0.2;        
 }
 
 MapBlock::~MapBlock()
 {
-    for(size_t i=0; i<m_people_num; i++)
+    for(size_t i=0; i<m_people_num; ++i)
     {
         delete m_people[i];
+    }
+    for(size_t i=0; i<m_dead_people.size(); ++i)
+    {
+        delete m_dead_people[i];
     }
 }
 
@@ -285,7 +289,8 @@ void MapBlock::check_walls_collision()
     {
         for(size_t i=0; i<erase_id.size(); ++i)
         {
-            m_people.erase(m_people.begin()+erase_id[i]);
+            m_people[erase_id[i]] = m_people.back();
+            m_people.pop_back();
             m_people_num -= 1;
         }
     }
@@ -310,7 +315,9 @@ void MapBlock::check_person_collision(size_t num)
         {
             // If there's a collision, make the people stop, and give them a speed
             // to move away from each other. Then check the collision again.
-            if((abs(cur_move_x_pos-move_x_pos) < 15) && (abs(cur_move_y_pos-move_y_pos) < 15))
+            float distance = (cur_move_x_pos-move_x_pos) * (cur_move_x_pos-move_x_pos) + (cur_move_y_pos-move_y_pos) * (cur_move_y_pos-move_y_pos);
+            float collision_bound = (2 * m_people[i]->r()) * (2 * m_people[i]->r());
+            if(distance < collision_bound)
             {
                 m_people[num]->x_speed() = 0;
                 m_people[num]->y_speed() = 0;
@@ -338,8 +345,39 @@ void MapBlock::check_people_collision()
         if(!m_people[i]->pass_door())
         {
             check_person_collision(i);
+        }     
+    }
+}
+
+void MapBlock::check_fire_collision(size_t x, size_t y, size_t r)
+{
+    std::vector<size_t> erase_id;
+
+    for(size_t i=0; i<m_people_num; ++i)
+    {
+        float move_x_pos = m_people[i]->x() + m_people[i]->x_speed();
+        float move_y_pos = m_people[i]->y() + m_people[i]->y_speed();
+
+        // If there's a collision, the person is dead
+        float distance = (x-move_x_pos) * (x-move_x_pos) + (y-move_y_pos) * (y-move_y_pos);
+        float collision_bound = (m_people[i]->r() + r) * (m_people[i]->r() + r);
+        if(distance < collision_bound)
+        {
+            m_people[i]->is_dead() = true;
+            erase_id.push_back(i);
         }
-            
+    }
+
+    // Delete people who is dead
+    if(!erase_id.empty())
+    {
+        for(size_t i=0; i<erase_id.size(); ++i)
+        {
+            m_dead_people.push_back(m_people[erase_id[i]]);
+            m_people[erase_id[i]] = m_people.back();
+            m_people.pop_back();
+            m_people_num -= 1;
+        }
     }
 }
 
@@ -351,8 +389,8 @@ void MapBlock::people_move()
     }
 }
 
-void MapBlock::update_people()
-{
+void MapBlock::update_map_block()
+{   
     check_walls_collision();
     check_people_collision();
     people_move();

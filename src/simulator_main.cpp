@@ -6,7 +6,8 @@ int main( int argc, char* args[] )
 
     // Create walls and people on the map
     window_map.init_walls();
-    window_map.init_people();
+    window_map.init_map_block();
+    window_map.init_fire();
 
     //Event handler
     SDL_Event e;

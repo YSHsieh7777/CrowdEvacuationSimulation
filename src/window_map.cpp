@@ -58,7 +58,7 @@ WindowMap::WindowMap()
 
 WindowMap::~WindowMap()
 {
-    delete_people();
+    delete_map();
 
     //Destroy window    
     SDL_DestroyRenderer( gRenderer );
@@ -137,46 +137,85 @@ void WindowMap::init_walls()
     m_walls[11].h = 490;
 }
 
-void WindowMap::init_people()
+void WindowMap::init_map_block()
 {
-    lu_people = new MapBlock(80, 280, 80, 280, 5, 5, true, true, false, true);
-    ld_people = new MapBlock(80, 280, 310, 510, 5, 5, false, true, true, false);
-    ru_people = new MapBlock(310, 510, 80, 280, 5, 5, true, false, false, true);
-    rd_people = new MapBlock(310, 510, 310, 510, 5, 5, true, false, true, true);
-    lu_people->add_neighbors(NULL, ru_people, NULL, ld_people);
-    ld_people->add_neighbors(NULL, rd_people, lu_people, NULL);
-    ru_people->add_neighbors(lu_people, NULL, NULL, rd_people);
-    rd_people->add_neighbors(ld_people, NULL, ru_people, NULL);
+    lu_block = new MapBlock(80, 280, 80, 280, 5, 5, true, true, false, true);
+    ld_block = new MapBlock(80, 280, 310, 510, 5, 5, false, true, true, false);
+    ru_block = new MapBlock(310, 510, 80, 280, 5, 5, true, false, false, true);
+    rd_block = new MapBlock(310, 510, 310, 510, 5, 5, true, false, true, true);
+    lu_block->add_neighbors(NULL, ru_block, NULL, ld_block);
+    ld_block->add_neighbors(NULL, rd_block, lu_block, NULL);
+    ru_block->add_neighbors(lu_block, NULL, NULL, rd_block);
+    rd_block->add_neighbors(ld_block, NULL, ru_block, NULL);
 }
 
-void WindowMap::delete_people()
+void WindowMap::init_fire()
 {
-    delete lu_people;
-    delete ld_people;
-    delete ru_people;
-    delete rd_people;
+    count = 0;
+
+    Fire *f1 = new Fire(80, 510, 0);
+    m_fire.push_back(f1);
+    Fire *f2 = new Fire(510, 80, 0);
+    m_fire.push_back(f2);
+}
+
+void WindowMap::delete_map()
+{
+    delete lu_block;
+    delete ld_block;
+    delete ru_block;
+    delete rd_block;
+    delete m_fire[0];
+    delete m_fire[1];
 }
 
 void WindowMap::update_people()
 {
     // People move in the four blocks
-    lu_people->update_people();
-    ru_people->update_people();
-    ld_people->update_people();
-    rd_people->update_people();
+    lu_block->update_map_block();
+    ru_block->update_map_block();
+    ld_block->update_map_block();
+    rd_block->update_map_block();
+}
+
+void WindowMap::check_fire_collision()
+{
+    for(size_t i=0; i<2; ++i)
+    {
+        lu_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
+        ru_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
+        ld_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
+        rd_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
+    }
+}
+
+void WindowMap::update_fire()
+{
+    for(size_t i=0; i<2; ++i)
+    {
+        m_fire[i]->update_radius();
+    }
 }
 
 void WindowMap::render_people()
 {
     // Render each people in the four blocks
-    for(size_t i=0; i<lu_people->people_num(); ++i)
-        lu_people->people()[i]->render(gRenderer);
-    for(size_t i=0; i<ru_people->people_num(); ++i)
-        ru_people->people()[i]->render(gRenderer);
-    for(size_t i=0; i<ld_people->people_num(); ++i)
-        ld_people->people()[i]->render(gRenderer);
-    for(size_t i=0; i<rd_people->people_num(); ++i)
-        rd_people->people()[i]->render(gRenderer);
+    for(size_t i=0; i<lu_block->people_num(); ++i)
+        lu_block->people()[i]->render(gRenderer);
+    for(size_t i=0; i<ru_block->people_num(); ++i)
+        ru_block->people()[i]->render(gRenderer);
+    for(size_t i=0; i<ld_block->people_num(); ++i)
+        ld_block->people()[i]->render(gRenderer);
+    for(size_t i=0; i<rd_block->people_num(); ++i)
+        rd_block->people()[i]->render(gRenderer);
+}
+
+void WindowMap::render_fire()
+{
+    for(size_t i=0; i<2; ++i)
+    {
+        m_fire[i]->render(gRenderer);
+    }
 }
 
 void WindowMap::update_screen()
@@ -190,13 +229,28 @@ void WindowMap::update_screen()
     for(int i=0; i<12; i++)
     {
         SDL_RenderDrawRect( gRenderer, &m_walls[i] );
-    }                        
+    }        
+
+    // Update fire and check if the people is killed by fire
+    count += 1;
+    if(count > 100)
+    {
+        update_fire();
+        check_fire_collision();
+    }
+    else
+    {
+        count += 1;
+    }              
 
     // People move
     update_people();
 
     // Render people
     render_people();
+
+    // Render fire
+    render_fire();
 
     // Update screen
     SDL_RenderPresent( gRenderer );

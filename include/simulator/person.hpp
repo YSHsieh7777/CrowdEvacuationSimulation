@@ -28,6 +28,8 @@ public:
     float & y_next_speed();
     const bool & pass_door() const;
     bool & pass_door();
+    const bool & is_dead() const;
+    bool & is_dead();
 
     void update_speed();
     void move();
