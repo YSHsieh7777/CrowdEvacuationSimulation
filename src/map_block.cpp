@@ -77,8 +77,8 @@ void MapBlock::update_people_speed()
         m_average_y = 0.95 * m_average_y + 0.05 * m_people[i]->y_speed();
     }
 
-    std::cout << "average x: " << m_average_x << std::endl;
-    std::cout << "average y: " << m_average_y << std::endl;
+    // std::cout << "average x: " << m_average_x << std::endl;
+    // std::cout << "average y: " << m_average_y << std::endl;
 }
 
 void MapBlock::check_walls_collision()
@@ -349,7 +349,7 @@ void MapBlock::check_people_collision()
     }
 }
 
-void MapBlock::check_fire_collision(size_t x, size_t y, size_t r)
+void MapBlock::check_fire_collision(size_t x, size_t y, size_t r, size_t fire_id)
 {
     std::vector<size_t> erase_id;
 
@@ -359,12 +359,30 @@ void MapBlock::check_fire_collision(size_t x, size_t y, size_t r)
         float move_y_pos = m_people[i]->y() + m_people[i]->y_speed();
 
         // If there's a collision, the person is dead
-        float distance = (x-move_x_pos) * (x-move_x_pos) + (y-move_y_pos) * (y-move_y_pos);
-        float collision_bound = (m_people[i]->r() + r) * (m_people[i]->r() + r);
+        float distance = sqrt((x-move_x_pos) * (x-move_x_pos) + (y-move_y_pos) * (y-move_y_pos));
+        float collision_bound = m_people[i]->r() + r;
         if(distance < collision_bound)
         {
             m_people[i]->is_dead() = true;
             erase_id.push_back(i);
+        }
+        else
+        {
+            float gap = distance - collision_bound;
+            if(gap < m_people[i]->fire_distance()[fire_id])
+                m_people[i]->fire_distance()[fire_id] = gap;
+            float min_distance = std::min(m_people[i]->fire_distance()[0], m_people[i]->fire_distance()[1]);
+
+            if(min_distance < 30)
+                m_people[i]->panic_degree() = 5;
+            else if(min_distance >= 30 && min_distance < 60)
+                m_people[i]->panic_degree() = 4;
+            else if(min_distance >= 60 && min_distance < 90)
+                m_people[i]->panic_degree() = 3;
+            else if(min_distance >= 90 && min_distance < 120)
+                m_people[i]->panic_degree() = 2;
+            else if(min_distance >= 120 && min_distance < 150)
+                m_people[i]->panic_degree() = 1;
         }
     }
 

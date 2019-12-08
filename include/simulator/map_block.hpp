@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <math.h>
+#include <algorithm>
 #include <iostream>
 
 #include "person.hpp"
@@ -26,7 +27,7 @@ public:
     void check_walls_collision();
     void check_person_collision(size_t );
     void check_people_collision();
-    void check_fire_collision(size_t , size_t , size_t );
+    void check_fire_collision(size_t , size_t , size_t , size_t );
     void people_move();
     void update_fire();
     void update_map_block();

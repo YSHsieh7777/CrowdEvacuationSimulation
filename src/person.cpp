@@ -1,6 +1,6 @@
 #include "simulator/person.hpp"
 
-std::map<uint8_t, uint8_t> panic_to_red = {{0, 0}, {1, 255}};
+std::map<uint16_t, uint16_t> panic_to_red = {{0, 0}, {1, 50}, {2, 100}, {3, 150}, {4, 200}, {5, 255}};
 std::map<uint8_t, uint8_t> panic_to_green = {{0, 0}, {1, 0}};
 std::map<uint8_t, uint8_t> panic_to_blue = {{0, 0}, {1, 0}};
 
@@ -15,6 +15,8 @@ Person::Person(float x, float y , float r)
     m_y_next_speed = m_y_speed;
 
     m_panic_degree = 0;
+    m_fire_distance.push_back(500);
+    m_fire_distance.push_back(500);
     m_moving_distance_last_few_seconds = 0;  // A factor that affects panic_degree.
     m_dead = false;  
     m_pass_door = false;
@@ -38,6 +40,10 @@ const bool & Person::pass_door() const { return m_pass_door; }
 bool & Person::pass_door() { return m_pass_door; }
 const bool & Person::is_dead() const { return m_dead; }
 bool & Person::is_dead() { return m_dead; }
+const uint16_t & Person::panic_degree() const { return m_panic_degree; }
+uint16_t & Person::panic_degree() { return m_panic_degree; }
+const std::vector<float> & Person::fire_distance() const { return m_fire_distance; }
+std::vector<float> & Person::fire_distance() { return m_fire_distance; }
 
 void Person::move()
 {
@@ -50,7 +56,9 @@ void Person::move()
 
 void Person::setColor(SDL_Renderer* gRenderer)
 {
-    SDL_SetRenderDrawColor(gRenderer, panic_to_red[m_panic_degree], panic_to_green[m_panic_degree], panic_to_blue[m_panic_degree], 0xFF);
+    // std::cout << "degree: " << m_panic_degree << std::endl;
+    // std::cout << "color: " << panic_to_red[m_panic_degree] << std::endl;
+    SDL_SetRenderDrawColor(gRenderer, panic_to_red[m_panic_degree], 0, 0, 0xFF);
 }
 
 void Person::render(SDL_Renderer* gRenderer)

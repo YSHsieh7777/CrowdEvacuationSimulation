@@ -182,10 +182,10 @@ void WindowMap::check_fire_collision()
 {
     for(size_t i=0; i<2; ++i)
     {
-        lu_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
-        ru_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
-        ld_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
-        rd_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
+        lu_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r(), i);
+        ru_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r(), i);
+        ld_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r(), i);
+        rd_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r(), i);
     }
 }
 
