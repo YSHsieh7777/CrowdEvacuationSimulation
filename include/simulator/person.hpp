@@ -5,12 +5,11 @@
 #include <map>
 #include <vector>
 #include <stdlib.h>
-#include <iostream>
 
 class Person
 {
 public:
-    Person(float x, float y , float r);
+    Person(float , float , float );
     ~Person() = default;
 
     const float & x() const;
@@ -33,8 +32,6 @@ public:
     bool & is_dead();
     const uint16_t & panic_degree() const;
     uint16_t & panic_degree();
-    const std::vector<float> & fire_distance() const;
-    std::vector<float> & fire_distance();
 
     void update_speed();
     void move();
@@ -52,7 +49,6 @@ private:
 
 
     uint16_t m_panic_degree;
-    std::vector<float> m_fire_distance;
     bool m_update_fire_distance;
     float m_moving_distance_last_few_seconds;  // A factor that affects panic_degree.
     bool m_dead;

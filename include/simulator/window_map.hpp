@@ -37,6 +37,7 @@ private:
     MapBlock *ld_block;
     MapBlock *ru_block;
     MapBlock *rd_block;
+    MapBlock *outside_block;
 
     std::vector<Fire *> m_fire;
     uint32_t count;

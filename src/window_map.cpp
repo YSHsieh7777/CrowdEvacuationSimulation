@@ -139,14 +139,36 @@ void WindowMap::init_walls()
 
 void WindowMap::init_map_block()
 {
-    lu_block = new MapBlock(80, 280, 80, 280, 5, 5, true, true, false, true);
-    ld_block = new MapBlock(80, 280, 310, 510, 5, 5, false, true, true, false);
-    ru_block = new MapBlock(310, 510, 80, 280, 5, 5, true, false, false, true);
-    rd_block = new MapBlock(310, 510, 310, 510, 5, 5, true, false, true, true);
-    lu_block->add_neighbors(NULL, ru_block, NULL, ld_block);
-    ld_block->add_neighbors(NULL, rd_block, lu_block, NULL);
-    ru_block->add_neighbors(lu_block, NULL, NULL, rd_block);
-    rd_block->add_neighbors(ld_block, NULL, ru_block, NULL);
+    Door *l_door = new Door(50, 80, 170, 190, true);
+    Door *r_door = new Door(280, 310, 170, 190, false);
+    Door *u_door = NULL;
+    Door *d_door = new Door(170, 190, 280, 310, false);
+    lu_block = new MapBlock(80, 280, 80, 280, 5, 5, l_door, r_door, u_door, d_door);
+
+    l_door = NULL;
+    r_door = new Door(280, 310, 400, 420, false);
+    u_door = new Door(170, 190, 280, 310, false);
+    d_door = NULL;
+    ld_block = new MapBlock(80, 280, 310, 510, 5, 5, l_door, r_door, u_door, d_door);
+
+    l_door = new Door(280, 310, 170, 190, false);
+    r_door = NULL;
+    u_door = NULL;
+    d_door = new Door(400, 420, 280, 310, false);
+    ru_block = new MapBlock(310, 510, 80, 280, 5, 5, l_door, r_door, u_door, d_door);
+
+    l_door = new Door(280, 310, 400, 420, false);
+    r_door = NULL;
+    u_door = new Door(400, 420, 280, 310, false);
+    d_door = new Door(400, 420, 510, 540, false);
+    rd_block = new MapBlock(310, 510, 310, 510, 5, 5, l_door, r_door, u_door, d_door);
+
+    outside_block = new MapBlock(0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL);
+
+    lu_block->add_neighbors(outside_block, ru_block, outside_block, ld_block);
+    ld_block->add_neighbors(outside_block, rd_block, lu_block, outside_block);
+    ru_block->add_neighbors(lu_block, outside_block, outside_block, rd_block);
+    rd_block->add_neighbors(ld_block, outside_block, ru_block, outside_block);
 }
 
 void WindowMap::init_fire()

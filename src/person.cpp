@@ -15,8 +15,6 @@ Person::Person(float x, float y , float r)
     m_y_next_speed = m_y_speed;
 
     m_panic_degree = 0;
-    m_fire_distance.push_back(500);
-    m_fire_distance.push_back(500);
     m_moving_distance_last_few_seconds = 0;  // A factor that affects panic_degree.
     m_dead = false;  
     m_pass_door = false;
@@ -42,8 +40,6 @@ const bool & Person::is_dead() const { return m_dead; }
 bool & Person::is_dead() { return m_dead; }
 const uint16_t & Person::panic_degree() const { return m_panic_degree; }
 uint16_t & Person::panic_degree() { return m_panic_degree; }
-const std::vector<float> & Person::fire_distance() const { return m_fire_distance; }
-std::vector<float> & Person::fire_distance() { return m_fire_distance; }
 
 void Person::move()
 {
