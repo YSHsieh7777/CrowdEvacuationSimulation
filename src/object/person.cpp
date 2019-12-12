@@ -1,8 +1,8 @@
-#include "simulator/person.hpp"
+#include "object/person.hpp"
+
+#include <map>
 
 std::map<uint16_t, uint16_t> panic_to_red = {{0, 0}, {1, 50}, {2, 100}, {3, 150}, {4, 200}, {5, 255}};
-std::map<uint8_t, uint8_t> panic_to_green = {{0, 0}, {1, 0}};
-std::map<uint8_t, uint8_t> panic_to_blue = {{0, 0}, {1, 0}};
 
 Person::Person(float x, float y , float r)
 {

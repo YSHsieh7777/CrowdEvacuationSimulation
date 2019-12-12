@@ -1,16 +1,8 @@
-//Using SDL, SDL_image, standard IO, vectors, and strings
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <stdint.h>
-#include <string>
-#include <vector>
-#include <math.h>
-#include <algorithm>
-#include <iostream>
-#include <limits>
+#include "object/person.hpp"
+#include "object/door.hpp"
 
-#include "person.hpp"
-#include "door.hpp"
+#include <SDL2/SDL.h>
+#include <vector>
 
 class MapBlock
 {

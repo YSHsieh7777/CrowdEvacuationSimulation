@@ -1,4 +1,4 @@
-#include "simulator/door.hpp"
+#include "object/door.hpp"
 
 Door::Door(float l_bound, float r_bound , float u_bound, float d_bound, bool go_outside):
             m_l_bound(l_bound), m_r_bound(r_bound), m_u_bound(u_bound), m_d_bound(d_bound),

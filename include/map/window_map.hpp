@@ -1,14 +1,9 @@
-//Using SDL, SDL_image, standard IO, vectors, and strings
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <stdint.h>
-#include <string>
-#include <vector>
-#include <cmath>
-#include <iostream>
+#include "map/map_block.hpp"
+#include "object/fire.hpp"
 
-#include "map_block.hpp"
-#include "fire.hpp"
+#include <SDL2/SDL.h>
+#include <stdint.h> 
+#include <vector>
 
 class WindowMap
 {
@@ -26,8 +21,10 @@ public:
     void render_fire();
     void update_fire();
     void check_fire_collision();
+    bool check_all_alive_indoor();
+    size_t get_alive_num();
 
-    void update_screen();
+    bool update_screen();
 
 private:
     SDL_Renderer* gRenderer;

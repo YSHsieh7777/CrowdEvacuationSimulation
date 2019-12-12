@@ -1,4 +1,4 @@
-#include "simulator/window_map.hpp"
+#include "map/window_map.hpp"
 
 WindowMap::WindowMap()
 {
@@ -39,14 +39,6 @@ WindowMap::WindowMap()
             {
                 //Initialize renderer color
                 SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-
-                //Initialize PNG loading
-                int imgFlags = IMG_INIT_PNG;
-                if( !( IMG_Init( imgFlags ) & imgFlags ) )
-                {
-                    printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
-                    success = false;
-                }
             }
         }
     }
@@ -67,7 +59,6 @@ WindowMap::~WindowMap()
     gRenderer = NULL;
 
     //Quit SDL subsystems
-    IMG_Quit();
     SDL_Quit();
 }
 
@@ -83,53 +74,53 @@ void WindowMap::init_walls()
 
     m_walls[1].x = 50;
     m_walls[1].y = 280;
-    m_walls[1].w = 120;
+    m_walls[1].w = 110;
     m_walls[1].h = 30;
 
-    m_walls[2].x = 190;
+    m_walls[2].x = 200;
     m_walls[2].y = 280;
-    m_walls[2].w = 210;
+    m_walls[2].w = 190;
     m_walls[2].h = 30;
 
-    m_walls[3].x = 420;
+    m_walls[3].x = 430;
     m_walls[3].y = 280;
-    m_walls[3].w = 120;
+    m_walls[3].w = 110;
     m_walls[3].h = 30;
 
     m_walls[4].x = 50;
     m_walls[4].y = 510;
-    m_walls[4].w = 350;
+    m_walls[4].w = 340;
     m_walls[4].h = 30;
 
-    m_walls[5].x = 420;
+    m_walls[5].x = 430;
     m_walls[5].y = 510;
-    m_walls[5].w = 120;
+    m_walls[5].w = 110;
     m_walls[5].h = 30;
 
     m_walls[6].x = 50;
     m_walls[6].y = 50;
     m_walls[6].w = 30;
-    m_walls[6].h = 120;
+    m_walls[6].h = 110;
 
     m_walls[7].x = 50;
-    m_walls[7].y = 190;
+    m_walls[7].y = 200;
     m_walls[7].w = 30;
-    m_walls[7].h = 350;
+    m_walls[7].h = 340;
 
     m_walls[8].x = 280;
     m_walls[8].y = 50;
     m_walls[8].w = 30;
-    m_walls[8].h = 120;
+    m_walls[8].h = 110;
 
     m_walls[9].x = 280;
-    m_walls[9].y = 190;
+    m_walls[9].y = 200;
     m_walls[9].w = 30;
-    m_walls[9].h = 210;
+    m_walls[9].h = 190;
 
     m_walls[10].x = 280;
-    m_walls[10].y = 420;
+    m_walls[10].y = 430;
     m_walls[10].w = 30;
-    m_walls[10].h = 120;
+    m_walls[10].h = 110;
 
     m_walls[11].x = 510;
     m_walls[11].y = 50;
@@ -139,29 +130,29 @@ void WindowMap::init_walls()
 
 void WindowMap::init_map_block()
 {
-    Door *l_door = new Door(50, 80, 170, 190, true);
-    Door *r_door = new Door(280, 310, 170, 190, false);
+    Door *l_door = new Door(50, 80, 160, 200, true);
+    Door *r_door = new Door(280, 310, 160, 200, false);
     Door *u_door = NULL;
-    Door *d_door = new Door(170, 190, 280, 310, false);
-    lu_block = new MapBlock(80, 280, 80, 280, 5, 5, l_door, r_door, u_door, d_door);
+    Door *d_door = new Door(160, 200, 280, 310, false);
+    lu_block = new MapBlock(80, 280, 80, 280, 0, 0, l_door, r_door, u_door, d_door);
 
     l_door = NULL;
-    r_door = new Door(280, 310, 400, 420, false);
-    u_door = new Door(170, 190, 280, 310, false);
+    r_door = new Door(280, 310, 390, 430, false);
+    u_door = new Door(160, 200, 280, 310, false);
     d_door = NULL;
-    ld_block = new MapBlock(80, 280, 310, 510, 5, 5, l_door, r_door, u_door, d_door);
+    ld_block = new MapBlock(80, 280, 310, 510, 6, 6, l_door, r_door, u_door, d_door);
 
-    l_door = new Door(280, 310, 170, 190, false);
+    l_door = new Door(280, 310, 160, 200, false);
     r_door = NULL;
     u_door = NULL;
-    d_door = new Door(400, 420, 280, 310, false);
-    ru_block = new MapBlock(310, 510, 80, 280, 5, 5, l_door, r_door, u_door, d_door);
+    d_door = new Door(390, 430, 280, 310, false);
+    ru_block = new MapBlock(310, 510, 80, 280, 6, 6, l_door, r_door, u_door, d_door);
 
-    l_door = new Door(280, 310, 400, 420, false);
+    l_door = new Door(280, 310, 390, 430, false);
     r_door = NULL;
-    u_door = new Door(400, 420, 280, 310, false);
-    d_door = new Door(400, 420, 510, 540, false);
-    rd_block = new MapBlock(310, 510, 310, 510, 5, 5, l_door, r_door, u_door, d_door);
+    u_door = new Door(390, 430, 280, 310, false);
+    d_door = new Door(390, 430, 510, 540, true);
+    rd_block = new MapBlock(310, 510, 310, 510, 0, 0, l_door, r_door, u_door, d_door);
 
     outside_block = new MapBlock(0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL);
 
@@ -187,6 +178,7 @@ void WindowMap::delete_map()
     delete ld_block;
     delete ru_block;
     delete rd_block;
+    delete outside_block;
     delete m_fire[0];
     delete m_fire[1];
 }
@@ -240,7 +232,21 @@ void WindowMap::render_fire()
     }
 }
 
-void WindowMap::update_screen()
+bool WindowMap::check_all_alive_indoor()
+{
+    if((lu_block->people_num() == 0) && (ld_block->people_num() == 0) && 
+        (ru_block->people_num() == 0) && (rd_block->people_num() == 0))
+        return false;
+
+    return true;
+}
+
+size_t WindowMap::get_alive_num()
+{
+    return outside_block->people_num();
+}
+
+bool WindowMap::update_screen()
 {
     // Clear screen
     SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
@@ -263,7 +269,11 @@ void WindowMap::update_screen()
     else
     {
         count += 1;
-    }              
+    }   
+
+    bool is_alive = check_all_alive_indoor();
+    if(!is_alive)
+        return false;           
 
     // People move
     update_people();
@@ -276,4 +286,6 @@ void WindowMap::update_screen()
 
     // Update screen
     SDL_RenderPresent( gRenderer );
+
+    return true;
 }

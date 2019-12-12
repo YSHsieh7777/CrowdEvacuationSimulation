@@ -1,10 +1,4 @@
-#include <utility>
-#include <stdint.h>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <map>
-#include <vector>
-#include <stdlib.h>
 
 class Fire
 {

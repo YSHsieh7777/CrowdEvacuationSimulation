@@ -1,4 +1,5 @@
-#include "simulator/fire.hpp"
+#include "object/fire.hpp"
+
 
 Fire::Fire(float x, float y , float r)
 {
