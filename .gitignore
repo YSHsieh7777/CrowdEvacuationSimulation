@@ -31,3 +31,4 @@
 *.out
 *.app
 simulation
+unit_test
