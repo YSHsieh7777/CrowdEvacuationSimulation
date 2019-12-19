@@ -52,8 +52,6 @@ void Person::move()
 
 void Person::setColor(SDL_Renderer* gRenderer)
 {
-    // std::cout << "degree: " << m_panic_degree << std::endl;
-    // std::cout << "color: " << panic_to_red[m_panic_degree] << std::endl;
     SDL_SetRenderDrawColor(gRenderer, panic_to_red[m_panic_degree], 0, 0, 0xFF);
 }
 

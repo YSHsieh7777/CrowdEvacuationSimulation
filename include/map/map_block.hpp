@@ -15,20 +15,19 @@ public:
     const std::vector<Person* > & people() const;
     std::vector<Person* > & people();
 
-    void init_people();
+    void add_neighbors(MapBlock* , MapBlock* , MapBlock* , MapBlock* );
+
+    void check_walls_collision();
+    void check_move_to_other_block();
+    void check_person_collision(size_t );
+    void check_people_collision();
+    void check_fire_collision(size_t , size_t , size_t );
 
     void get_min_door_distance(float , float , float & , float & );
     void update_people_speed();
-    void check_move_to_other_block();
-    void check_walls_collision();
-    void check_person_collision(size_t );
-    void check_people_collision();
-    void check_fire_collision(size_t , size_t , size_t , size_t );
     void people_move();
-    void update_fire();
-    void update_map_block();
 
-    void add_neighbors(MapBlock* , MapBlock* , MapBlock* , MapBlock* );
+    void update_map_block();
 
 private:
     std::vector<Person *> m_people;

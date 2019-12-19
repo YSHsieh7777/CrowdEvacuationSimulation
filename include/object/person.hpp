@@ -28,7 +28,6 @@ public:
     const uint16_t & panic_degree() const;
     uint16_t & panic_degree();
 
-    void update_speed();
     void move();
 
     void setColor(SDL_Renderer* );
@@ -41,7 +40,6 @@ private:
     float m_radius;
     float m_x_speed, m_y_speed;
     float m_x_next_speed, m_y_next_speed;
-
 
     uint16_t m_panic_degree;
     bool m_update_fire_distance;

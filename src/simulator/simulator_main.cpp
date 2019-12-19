@@ -1,6 +1,7 @@
 #include "map/window_map.hpp"
 
 #include <iostream>
+#include <time.h>
 
 int main( int argc, char* args[] )
 {
@@ -27,9 +28,16 @@ int main( int argc, char* args[] )
             }
         }
 
-        is_alive = window_map->update_screen();
-        if(!is_alive)
+        // calculate execution time
+        clock_t begin = clock();
+        if(!(is_alive = window_map->update_screen()))
             break;
+        clock_t end = clock();
+
+        double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+        double fps = 1 / time_spent;
+
+        std::cout << "fps: " << fps << '\n';
     }
 
     std::cout << "alive people number: " << window_map->get_alive_num() << '\n';

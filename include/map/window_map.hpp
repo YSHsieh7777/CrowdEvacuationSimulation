@@ -14,17 +14,18 @@ public:
     void init_walls();   
     void init_map_block();
     void init_fire();
-
     void delete_map();
+
     void update_people(); 
     void render_people();
-    void render_fire();
-    void update_fire();
     void check_fire_collision();
-    bool check_all_alive_indoor();
-    size_t get_alive_num();
-
+    void update_fire();
+    void render_fire();
     bool update_screen();
+
+    bool check_all_alive_indoor();
+
+    size_t get_alive_num();
 
 private:
     SDL_Renderer* gRenderer;

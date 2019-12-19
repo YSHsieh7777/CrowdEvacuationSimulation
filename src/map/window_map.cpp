@@ -192,25 +192,6 @@ void WindowMap::update_people()
     rd_block->update_map_block();
 }
 
-void WindowMap::check_fire_collision()
-{
-    for(size_t i=0; i<2; ++i)
-    {
-        lu_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r(), i);
-        ru_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r(), i);
-        ld_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r(), i);
-        rd_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r(), i);
-    }
-}
-
-void WindowMap::update_fire()
-{
-    for(size_t i=0; i<2; ++i)
-    {
-        m_fire[i]->update_radius();
-    }
-}
-
 void WindowMap::render_people()
 {
     // Render each people in the four blocks
@@ -224,26 +205,31 @@ void WindowMap::render_people()
         rd_block->people()[i]->render(gRenderer);
 }
 
+void WindowMap::check_fire_collision()
+{
+    for(size_t i=0; i<2; ++i)
+    {
+        lu_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
+        ru_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
+        ld_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
+        rd_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
+    }
+}
+
+void WindowMap::update_fire()
+{
+    for(size_t i=0; i<2; ++i)
+    {
+        m_fire[i]->update_radius();
+    }
+}
+
 void WindowMap::render_fire()
 {
     for(size_t i=0; i<2; ++i)
     {
         m_fire[i]->render(gRenderer);
     }
-}
-
-bool WindowMap::check_all_alive_indoor()
-{
-    if((lu_block->people_num() == 0) && (ld_block->people_num() == 0) && 
-        (ru_block->people_num() == 0) && (rd_block->people_num() == 0))
-        return false;
-
-    return true;
-}
-
-size_t WindowMap::get_alive_num()
-{
-    return outside_block->people_num();
 }
 
 bool WindowMap::update_screen()
@@ -288,4 +274,18 @@ bool WindowMap::update_screen()
     SDL_RenderPresent( gRenderer );
 
     return true;
+}
+
+bool WindowMap::check_all_alive_indoor()
+{
+    if((lu_block->people_num() == 0) && (ld_block->people_num() == 0) && 
+        (ru_block->people_num() == 0) && (rd_block->people_num() == 0))
+        return false;
+
+    return true;
+}
+
+size_t WindowMap::get_alive_num()
+{
+    return outside_block->people_num();
 }
