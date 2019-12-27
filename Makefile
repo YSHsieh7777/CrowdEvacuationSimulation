@@ -1,6 +1,6 @@
 
 CXX				= g++
-CXXFLAGS		= -std=c++11 -Wall 
+CXXFLAGS		= -std=c++11 -Wall -g 
 LIBS			= -lSDL2
 TESTLIBS		= -lSDL2 -lgtest -lpthread -lm
 INCLUDES		= -Iinclude

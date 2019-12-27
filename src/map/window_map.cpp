@@ -134,7 +134,7 @@ void WindowMap::init_map_block()
     Door *r_door = new Door(280, 310, 160, 200, false);
     Door *u_door = NULL;
     Door *d_door = new Door(160, 200, 280, 310, false);
-    lu_block = new MapBlock(80, 280, 80, 280, 0, 0, l_door, r_door, u_door, d_door);
+    lu_block = new MapBlock(80, 280, 80, 280, 4, 4, l_door, r_door, u_door, d_door);
 
     l_door = NULL;
     r_door = new Door(280, 310, 390, 430, false);
@@ -152,7 +152,7 @@ void WindowMap::init_map_block()
     r_door = NULL;
     u_door = new Door(390, 430, 280, 310, false);
     d_door = new Door(390, 430, 510, 540, true);
-    rd_block = new MapBlock(310, 510, 310, 510, 0, 0, l_door, r_door, u_door, d_door);
+    rd_block = new MapBlock(310, 510, 310, 510, 4, 4, l_door, r_door, u_door, d_door);
 
     outside_block = new MapBlock(0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL);
 
