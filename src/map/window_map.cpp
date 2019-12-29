@@ -247,7 +247,7 @@ bool WindowMap::update_screen()
 
     // Update fire and check if the people is killed by fire
     count += 1;
-    if(count > 100)
+    if(count > 1000)
     {
         update_fire();
         check_fire_collision();

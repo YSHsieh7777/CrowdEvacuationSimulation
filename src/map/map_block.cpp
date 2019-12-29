@@ -260,10 +260,6 @@ void MapBlock::check_person_collision(size_t num)
     float cur_move_x_pos = m_people[num]->x() + m_people[num]->x_speed();
     float cur_move_y_pos = m_people[num]->y() + m_people[num]->y_speed();
 
-    std::cout << "num: " << num << std::endl;
-    std::cout << "x: " << cur_move_x_pos << std::endl;
-    std::cout << "y: " << cur_move_y_pos << std::endl;
-
     for(size_t i=0; i<m_people_num; ++i)
     {
         if(m_people[i]->pass_door())
@@ -333,15 +329,15 @@ void MapBlock::check_fire_collision(size_t x, size_t y, size_t r)
         {
             float gap = distance - collision_bound;
 
-            if(gap < 30 && m_people[i]->panic_degree() < 5)
+            if(gap < 10 && m_people[i]->panic_degree() < 5)
                 m_people[i]->panic_degree() = 5;
-            else if(gap >= 30 && gap < 60 && m_people[i]->panic_degree() < 4)
+            else if(gap >= 20 && gap < 60 && m_people[i]->panic_degree() < 4)
                 m_people[i]->panic_degree() = 4;
-            else if(gap >= 60 && gap < 90 && m_people[i]->panic_degree() < 3)
+            else if(gap >= 60 && gap < 100 && m_people[i]->panic_degree() < 3)
                 m_people[i]->panic_degree() = 3;
-            else if(gap >= 90 && gap < 120 && m_people[i]->panic_degree() < 2)
+            else if(gap >= 100 && gap < 140 && m_people[i]->panic_degree() < 2)
                 m_people[i]->panic_degree() = 2;
-            else if(gap >= 120 && gap < 150 && m_people[i]->panic_degree() < 1)
+            else if(gap >= 140 && gap < 180 && m_people[i]->panic_degree() < 1)
                 m_people[i]->panic_degree() = 1;
         }
     }
@@ -420,14 +416,12 @@ void MapBlock::get_min_door_distance(float x, float y, float &r_x_speed, float &
             min_door_distance = r_distance;
             r_x_speed = r_door_x - x;
             r_y_speed = r_door_y - y;
-            std::cout << "x speed: " << r_x_speed << " y speed: " << r_y_speed << std::endl;
         }
         if(m_u_door && m_u_door->go_outside() && (u_distance < min_door_distance))
         {
             min_door_distance = u_distance;
             r_x_speed = u_door_x - x;
             r_y_speed = u_door_y - y;
-            std::cout << "x speed: " << r_x_speed << " y speed: " << r_y_speed << std::endl;
         }
         if(m_d_door && m_d_door->go_outside() && (d_distance < min_door_distance))
         {

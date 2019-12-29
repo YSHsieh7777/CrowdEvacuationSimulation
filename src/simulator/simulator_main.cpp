@@ -16,8 +16,14 @@ int main( int argc, char* args[] )
     SDL_Event e;
     bool is_alive = true;
     
+    // record the begin time
+    clock_t begin = clock();
+    double total_frame = 0;
+
     while(1)
     {
+        total_frame++;
+
         //Handle events on queue
         while(SDL_PollEvent( &e ) != 0)
         {
@@ -28,17 +34,15 @@ int main( int argc, char* args[] )
             }
         }
 
-        // calculate execution time
-        clock_t begin = clock();
         if(!(is_alive = window_map->update_screen()))
-            break;
-        clock_t end = clock();
-
-        double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-        double fps = 1 / time_spent;
-
-        std::cout << "fps: " << fps << '\n';
+            break;  
     }
+
+    // record the end time and caculate the average fps
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    double fps = total_frame / time_spent;
+    std::cout << "average fps: " << fps << '\n';
 
     std::cout << "alive people number: " << window_map->get_alive_num() << '\n';
     delete window_map;
