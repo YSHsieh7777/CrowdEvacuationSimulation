@@ -21,7 +21,7 @@ MapBlock::MapBlock(size_t l_bound, size_t r_bound, size_t u_bound,
     {
         for(uint8_t x=1; x<x_people_num+1; ++x)
         {    
-            // Init a person every 25 pixels and give them a random position in that block
+            // Init a person every 25 pixels and give him a random position in that block
             float rand_x_pos = x*25 + (17.5 - 7.5) * rand() / (RAND_MAX + 1.0) + 7.5;
             float rand_y_pos = y*25 + (17.5 - 7.5) * rand() / (RAND_MAX + 1.0) + 7.5;
             
@@ -78,57 +78,57 @@ void MapBlock::check_walls_collision()
         float move_u_bound = move_y_pos - person_radius;
         float move_d_bound = move_y_pos + person_radius;
 
-        // If there's a door on l wall
-        if(m_l_door)
+        if(move_l_bound < m_l_bound)
         {
-            // If the person will move into the wall, move him back.
-            if(move_l_bound < m_l_door->r_bound() && (move_u_bound < m_l_door->u_bound() || move_d_bound > m_l_door->d_bound()))
+            // If there's a door on l wall
+            if(m_l_door)
             {
-                m_people[i]->x_speed() =  -(m_people[i]->x() - m_l_bound - person_radius);
-                m_people[i]->x_next_speed() = 0.2;
-            }
-            // If the person will move into the door, give him a speed so that
-            // he can pass the door fast
-            else if(move_l_bound < m_l_door->r_bound() && (move_u_bound >= m_l_door->u_bound() || move_d_bound <= m_l_door->d_bound()))
-            {
-                if(!m_people[i]->pass_door() && m_people[i]->x_speed() < 0)
+                // If the person will move into the wall, move him back.
+                if(move_u_bound < m_l_door->u_bound() || move_d_bound > m_l_door->d_bound())
                 {
-                    m_people[i]->x_next_speed() = -0.5;
-                    m_people[i]->y_next_speed() = 0;
-                    m_people[i]->pass_door() = true;
+                    m_people[i]->x_speed() =  -(m_people[i]->x() - m_l_bound - person_radius);
+                    m_people[i]->x_next_speed() = 0.2;
+                }
+                // If the person will move into the door, give him a speed so that
+                // he can pass the door fast
+                else if(move_u_bound >= m_l_door->u_bound() || move_d_bound <= m_l_door->d_bound())
+                {
+                    if(!m_people[i]->pass_door() && m_people[i]->x_speed() < 0)
+                    {
+                        m_people[i]->x_next_speed() = -0.5;
+                        m_people[i]->y_next_speed() = 0;
+                        m_people[i]->pass_door() = true;
+                    }
                 }
             }
-        }
-        else
-        {
-            // If the person will move into the wall, move him back.
-            if(move_l_bound < m_l_bound)
+            else
             {
+                // If the person will move into the wall, move him back.
                 m_people[i]->x_speed() =  -(m_people[i]->x() - m_l_bound - person_radius);
                 m_people[i]->x_next_speed() = 0.2;
             }
         }
         
-        if(m_r_door)
-        {    
-            if(move_r_bound > m_r_door->l_bound() && (move_u_bound < m_r_door->u_bound() || move_d_bound > m_r_door->d_bound()))
-            {
-                m_people[i]->x_speed() =  m_r_bound - m_people[i]->x() - person_radius;
-                m_people[i]->x_next_speed() = -0.2;
-            }
-            else if(move_r_bound > m_r_door->l_bound() && (move_u_bound >= m_r_door->u_bound() || move_d_bound <= m_r_door->d_bound()))
-            {
-                if(!m_people[i]->pass_door() && m_people[i]->x_speed() > 0)
+        if(move_r_bound > m_r_bound)
+        {
+            if(m_r_door)
+            {    
+                if(move_u_bound < m_r_door->u_bound() || move_d_bound > m_r_door->d_bound())
                 {
-                    m_people[i]->x_next_speed() = 0.5;
-                    m_people[i]->y_next_speed() = 0;
-                    m_people[i]->pass_door() = true;
+                    m_people[i]->x_speed() =  m_r_bound - m_people[i]->x() - person_radius;
+                    m_people[i]->x_next_speed() = -0.2;
+                }
+                else if(move_u_bound >= m_r_door->u_bound() || move_d_bound <= m_r_door->d_bound())
+                {
+                    if(!m_people[i]->pass_door() && m_people[i]->x_speed() > 0)
+                    {
+                        m_people[i]->x_next_speed() = 0.5;
+                        m_people[i]->y_next_speed() = 0;
+                        m_people[i]->pass_door() = true;
+                    }
                 }
             }
-        }
-        else
-        {
-            if(move_r_bound > m_r_bound)
+            else
             {
                 m_people[i]->x_speed() = m_r_bound - m_people[i]->x() - person_radius;
                 m_people[i]->x_next_speed() = -0.2;

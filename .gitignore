@@ -32,3 +32,6 @@
 *.app
 simulation
 unit_test
+
+# valgrind output
+cachegrind*
