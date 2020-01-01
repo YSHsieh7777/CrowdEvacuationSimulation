@@ -20,8 +20,8 @@ WindowMap::WindowMap()
         }
 
         //Create window
-        gWindow = SDL_CreateWindow( "Evacuation Simulation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
-        if( gWindow == NULL )
+        m_gWindow = SDL_CreateWindow( "Evacuation Simulation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+        if( m_gWindow == NULL )
         {
             printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
             success = false;
@@ -29,8 +29,8 @@ WindowMap::WindowMap()
         else
         {
             //Create vsynced renderer for window
-            gRenderer = SDL_CreateRenderer( gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
-            if( gRenderer == NULL )
+            m_gRenderer = SDL_CreateRenderer( m_gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
+            if( m_gRenderer == NULL )
             {
                 printf( "Renderer could not be created! SDL Error: %s\n", SDL_GetError() );
                 success = false;
@@ -38,7 +38,7 @@ WindowMap::WindowMap()
             else
             {
                 //Initialize renderer color
-                SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+                SDL_SetRenderDrawColor( m_gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
             }
         }
     }
@@ -53,10 +53,10 @@ WindowMap::~WindowMap()
     delete_map();
 
     //Destroy window    
-    SDL_DestroyRenderer( gRenderer );
-    SDL_DestroyWindow( gWindow );
-    gWindow = NULL;
-    gRenderer = NULL;
+    SDL_DestroyRenderer( m_gRenderer );
+    SDL_DestroyWindow( m_gWindow );
+    m_gWindow = NULL;
+    m_gRenderer = NULL;
 
     //Quit SDL subsystems
     SDL_Quit();
@@ -134,7 +134,7 @@ void WindowMap::init_map_block()
     Door *r_door = new Door(280, 310, 160, 200, false);
     Door *u_door = NULL;
     Door *d_door = new Door(160, 200, 280, 310, false);
-    lu_block = new MapBlock(80, 280, 80, 280, 4, 4, l_door, r_door, u_door, d_door);
+    lu_block = new MapBlock(80, 280, 80, 280, 3, 3, l_door, r_door, u_door, d_door);
 
     l_door = NULL;
     r_door = new Door(280, 310, 390, 430, false);
@@ -152,7 +152,7 @@ void WindowMap::init_map_block()
     r_door = NULL;
     u_door = new Door(390, 430, 280, 310, false);
     d_door = new Door(390, 430, 510, 540, true);
-    rd_block = new MapBlock(310, 510, 310, 510, 4, 4, l_door, r_door, u_door, d_door);
+    rd_block = new MapBlock(310, 510, 310, 510, 3, 3, l_door, r_door, u_door, d_door);
 
     outside_block = new MapBlock(0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL);
 
@@ -164,7 +164,7 @@ void WindowMap::init_map_block()
 
 void WindowMap::init_fire()
 {
-    count = 0;
+    m_count = 0;
 
     Fire *f1 = new Fire(80, 510, 0);
     m_fire.push_back(f1);
@@ -183,95 +183,81 @@ void WindowMap::delete_map()
     delete m_fire[1];
 }
 
-void WindowMap::update_people()
+void WindowMap::update_blocks()
 {
     // People move in the four blocks
-    lu_block->update_map_block();
-    ru_block->update_map_block();
-    ld_block->update_map_block();
-    rd_block->update_map_block();
+    lu_block->update_map_block(m_fire, m_count);
+    ru_block->update_map_block(m_fire, m_count);
+    ld_block->update_map_block(m_fire, m_count);
+    rd_block->update_map_block(m_fire, m_count);
 }
 
 void WindowMap::render_people()
 {
     // Render each people in the four blocks
     for(size_t i=0; i<lu_block->people_num(); ++i)
-        lu_block->people()[i]->render(gRenderer);
+        lu_block->people()[i]->render(m_gRenderer);
     for(size_t i=0; i<ru_block->people_num(); ++i)
-        ru_block->people()[i]->render(gRenderer);
+        ru_block->people()[i]->render(m_gRenderer);
     for(size_t i=0; i<ld_block->people_num(); ++i)
-        ld_block->people()[i]->render(gRenderer);
+        ld_block->people()[i]->render(m_gRenderer);
     for(size_t i=0; i<rd_block->people_num(); ++i)
-        rd_block->people()[i]->render(gRenderer);
+        rd_block->people()[i]->render(m_gRenderer);
 }
 
-void WindowMap::check_fire_collision()
-{
-    for(size_t i=0; i<2; ++i)
-    {
-        lu_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
-        ru_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
-        ld_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
-        rd_block->check_fire_collision(m_fire[i]->x(), m_fire[i]->y(), m_fire[i]->r());
-    }
-}
 
 void WindowMap::update_fire()
 {
-    for(size_t i=0; i<2; ++i)
+    // Update fire and check if the people is killed by fire
+    if(m_count > 1000)
     {
-        m_fire[i]->update_radius();
+        for(size_t i=0; i<2; ++i)
+        {
+            m_fire[i]->update_radius();
+        }
     }
+    else
+    {
+        m_count++;
+    }  
 }
 
 void WindowMap::render_fire()
 {
     for(size_t i=0; i<2; ++i)
     {
-        m_fire[i]->render(gRenderer);
+        m_fire[i]->render(m_gRenderer);
     }
 }
 
-bool WindowMap::update_screen()
+void WindowMap::clear_screen()
 {
     // Clear screen
-    SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-    SDL_RenderClear( gRenderer );
-    
+    SDL_SetRenderDrawColor( m_gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+    SDL_RenderClear( m_gRenderer );
+}
+
+void WindowMap::render_walls()
+{
     // Render wall
-    SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
+    SDL_SetRenderDrawColor( m_gRenderer, 0x00, 0x00, 0x00, 0xFF );
     for(int i=0; i<12; i++)
     {
-        SDL_RenderDrawRect( gRenderer, &m_walls[i] );
-    }        
+        SDL_RenderDrawRect( m_gRenderer, &m_walls[i] );
+    }    
+}
 
-    // Update fire and check if the people is killed by fire
-    count += 1;
-    if(count > 1000)
-    {
-        update_fire();
-        check_fire_collision();
-    }
-    else
-    {
-        count += 1;
-    }   
+bool WindowMap::update_screen()
+{ 
+    update_fire();
+    update_blocks();
 
-    bool is_alive = check_all_alive_indoor();
-    if(!is_alive)
-        return false;           
-
-    // People move
-    update_people();
-
-    // Render people
-    render_people();
-
-    // Render fire
+    render_walls();
     render_fire();
-
+    render_people();
+    
     // Update screen
-    SDL_RenderPresent( gRenderer );
+    SDL_RenderPresent( m_gRenderer );
 
     return true;
 }

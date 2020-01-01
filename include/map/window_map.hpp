@@ -1,5 +1,4 @@
 #include "map/map_block.hpp"
-#include "object/fire.hpp"
 
 #include <SDL2/SDL.h>
 #include <stdint.h> 
@@ -16,11 +15,12 @@ public:
     void init_fire();
     void delete_map();
 
-    void update_people(); 
+    void update_blocks(); 
     void render_people();
-    void check_fire_collision();
     void update_fire();
     void render_fire();
+    void render_walls();
+    void clear_screen();
     bool update_screen();
 
     bool check_all_alive_indoor();
@@ -28,8 +28,8 @@ public:
     size_t get_alive_num();
 
 private:
-    SDL_Renderer* gRenderer;
-    SDL_Window* gWindow;
+    SDL_Renderer* m_gRenderer;
+    SDL_Window* m_gWindow;
     std::vector<SDL_Rect> m_walls;
     MapBlock *lu_block;
     MapBlock *ld_block;
@@ -38,7 +38,7 @@ private:
     MapBlock *outside_block;
 
     std::vector<Fire *> m_fire;
-    uint32_t count;
+    uint32_t m_count;
 
     const size_t SCREEN_WIDTH = 590;
     const size_t SCREEN_HEIGHT = 590;
