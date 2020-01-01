@@ -6,6 +6,9 @@ TESTLIBS		= -lSDL2 -lgtest -lpthread -lm
 INCLUDES		= -Iinclude
 
 BUILDDIR		= build
+UTILDIR			= src/utils
+UTIL			= $(wildcard $(UTILDIR)/*.cpp)
+UTILOBJS		= $(patsubst $(UTILDIR)/%.cpp,$(BUILDDIR)/%.o,$(UTIL))
 MAPDIR			= src/map
 MAP				= $(wildcard $(MAPDIR)/*.cpp)
 MAPOBJS			= $(patsubst $(MAPDIR)/%.cpp,$(BUILDDIR)/%.o,$(MAP))
@@ -19,12 +22,12 @@ UNITTESTDIR		= unittest
 UNITTEST		= $(wildcard $(UNITTESTDIR)/*.cpp)
 UNITTESTOBJS	= $(patsubst $(UNITTESTDIR)/%.cpp,$(BUILDDIR)/%.o,$(UNITTEST))
 
-OBJS			= $(MAPOBJS) $(OBJECTOBJS) $(SIMULATOROBJS)
-TESTOBJS		= $(MAPOBJS) $(OBJECTOBJS) $(UNITTESTOBJS)
+OBJS			= $(UTILOBJS) $(MAPOBJS) $(OBJECTOBJS) $(SIMULATOROBJS)
+TESTOBJS		= $(UTILOBJS) $(MAPOBJS) $(OBJECTOBJS) $(UNITTESTOBJS)
 
 EXEC			= simulation
 TESTEXEC		= unit_test
-VPATH			= $(SIMULATORDIR) $(MAPDIR) $(OBJCETDIR) $(UNITTESTDIR)
+VPATH			= $(SIMULATORDIR) $(UTILDIR) $(MAPDIR) $(OBJCETDIR) $(UNITTESTDIR)
 
 
 all: make_build_dir $(EXEC)

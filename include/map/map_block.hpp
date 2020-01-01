@@ -1,6 +1,6 @@
-#include "object/person.hpp"
 #include "object/door.hpp"
 #include "object/fire.hpp"
+#include "utils/speed_manager.hpp"
 
 #include <SDL2/SDL.h>
 #include <vector>
@@ -8,7 +8,7 @@
 class MapBlock
 {
 public:
-    MapBlock(size_t , size_t , size_t , size_t , size_t , size_t , Door* , Door* , Door* , Door* );
+    MapBlock(size_t , size_t , size_t , size_t , size_t , size_t , Door* , Door* , Door* , Door* , bool );
     ~MapBlock();
 
     const size_t & people_num() const;
@@ -49,11 +49,12 @@ private:
     Door* m_r_door;
     Door* m_u_door;
     Door* m_d_door;
+    bool m_has_out_door;
 
     MapBlock *m_l_neighbor = NULL;
     MapBlock *m_r_neighbor = NULL;
     MapBlock *m_u_neighbor = NULL;
     MapBlock *m_d_neighbor = NULL;
 
-    float m_average_x, m_average_y;
+    SpeedManager *m_sm = NULL;
 };

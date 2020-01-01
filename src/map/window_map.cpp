@@ -134,27 +134,27 @@ void WindowMap::init_map_block()
     Door *r_door = new Door(280, 310, 160, 200, false);
     Door *u_door = NULL;
     Door *d_door = new Door(160, 200, 280, 310, false);
-    lu_block = new MapBlock(80, 280, 80, 280, 3, 3, l_door, r_door, u_door, d_door);
+    lu_block = new MapBlock(80, 280, 80, 280, 3, 3, l_door, r_door, u_door, d_door, true);
 
     l_door = NULL;
     r_door = new Door(280, 310, 390, 430, false);
     u_door = new Door(160, 200, 280, 310, false);
     d_door = NULL;
-    ld_block = new MapBlock(80, 280, 310, 510, 6, 6, l_door, r_door, u_door, d_door);
+    ld_block = new MapBlock(80, 280, 310, 510, 6, 6, l_door, r_door, u_door, d_door, false);
 
     l_door = new Door(280, 310, 160, 200, false);
     r_door = NULL;
     u_door = NULL;
     d_door = new Door(390, 430, 280, 310, false);
-    ru_block = new MapBlock(310, 510, 80, 280, 6, 6, l_door, r_door, u_door, d_door);
+    ru_block = new MapBlock(310, 510, 80, 280, 6, 6, l_door, r_door, u_door, d_door, false);
 
     l_door = new Door(280, 310, 390, 430, false);
     r_door = NULL;
     u_door = new Door(390, 430, 280, 310, false);
     d_door = new Door(390, 430, 510, 540, true);
-    rd_block = new MapBlock(310, 510, 310, 510, 3, 3, l_door, r_door, u_door, d_door);
+    rd_block = new MapBlock(310, 510, 310, 510, 3, 3, l_door, r_door, u_door, d_door, true);
 
-    outside_block = new MapBlock(0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL);
+    outside_block = new MapBlock(0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, false);
 
     lu_block->add_neighbors(outside_block, ru_block, outside_block, ld_block);
     ld_block->add_neighbors(outside_block, rd_block, lu_block, outside_block);
@@ -209,7 +209,7 @@ void WindowMap::render_people()
 void WindowMap::update_fire()
 {
     // Update fire and check if the people is killed by fire
-    if(m_count > 1000)
+    if(m_count > 500)
     {
         for(size_t i=0; i<2; ++i)
         {

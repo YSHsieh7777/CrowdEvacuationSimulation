@@ -9,11 +9,11 @@
 MapBlock::MapBlock(size_t l_bound, size_t r_bound, size_t u_bound, 
                     size_t d_bound, size_t x_people_num, size_t y_people_num,
                     Door* l_door, Door* r_door, Door* u_door, 
-                    Door* d_door): 
+                    Door* d_door, bool has_out_door): 
                     m_l_bound(l_bound), m_r_bound(r_bound),
                     m_u_bound(u_bound), m_d_bound(d_bound),
                     m_l_door(l_door), m_r_door(r_door),
-                    m_u_door(u_door), m_d_door(d_door) 
+                    m_u_door(u_door), m_d_door(d_door), m_has_out_door(has_out_door) 
 {
     m_people_num = x_people_num * y_people_num;
 
@@ -30,10 +30,7 @@ MapBlock::MapBlock(size_t l_bound, size_t r_bound, size_t u_bound,
         }
     }
 
-    // Init a random average speed in a block
-    // People in the block will move depending on that speed
-    m_average_x = 0.4 * rand() / (RAND_MAX + 1.0) - 0.2;
-    m_average_y = 0.4 * rand() / (RAND_MAX + 1.0) - 0.2;        
+    m_sm = new SpeedManager(); 
 }
 
 MapBlock::~MapBlock()
@@ -51,6 +48,7 @@ MapBlock::~MapBlock()
     delete m_r_door;
     delete m_u_door;
     delete m_d_door;
+    delete m_sm;
 }
 
 const size_t & MapBlock::people_num() const { return m_people_num; }
@@ -71,8 +69,6 @@ bool MapBlock::move_in_door(float move_l_bound, float move_r_bound, float door_l
     return (move_l_bound >= door_l_bound && move_r_bound <= door_r_bound);
 }
 
-
-
 void MapBlock::check_walls_collision(Person *cur_person, float person_radius, float move_l_bound, 
                                      float move_r_bound, float move_u_bound, float move_d_bound)
 {    
@@ -85,16 +81,15 @@ void MapBlock::check_walls_collision(Person *cur_person, float person_radius, fl
         {      
             if(!cur_person->pass_door() && cur_person->x_speed() < 0)
             {
-                cur_person->x_next_speed() = -0.5;
-                cur_person->y_next_speed() = 0;
+                m_sm->set_next_speed(cur_person, -0.5, 0);
                 cur_person->pass_door() = true;
             }
         }
         else
         {
             // If the person will move into the wall, move him back.
-            cur_person->x_speed() =  -(cur_person->x() - m_l_bound - person_radius);
-            cur_person->x_next_speed() = 0.2;
+            m_sm->set_speed(cur_person, -(cur_person->x() - m_l_bound - person_radius), cur_person->y_speed());
+            m_sm->set_next_speed(cur_person, 0.2, cur_person->y_next_speed());
         }
     }
     
@@ -104,15 +99,14 @@ void MapBlock::check_walls_collision(Person *cur_person, float person_radius, fl
         {    
             if(!cur_person->pass_door() && cur_person->x_speed() > 0)
             {
-                cur_person->x_next_speed() = 0.5;
-                cur_person->y_next_speed() = 0;
+                m_sm->set_next_speed(cur_person, 0.5, 0);
                 cur_person->pass_door() = true;
             }
         }
         else
         {
-            cur_person->x_speed() = m_r_bound - cur_person->x() - person_radius;
-            cur_person->x_next_speed() = -0.2;
+            m_sm->set_speed(cur_person, (m_r_bound - cur_person->x() - person_radius), cur_person->y_speed());
+            m_sm->set_next_speed(cur_person, -0.2, cur_person->y_next_speed());
         }
     }
     
@@ -122,15 +116,14 @@ void MapBlock::check_walls_collision(Person *cur_person, float person_radius, fl
         {
             if(!cur_person->pass_door() && cur_person->y_speed() < 0)
             {
-                cur_person->y_next_speed() = -0.5;
-                cur_person->x_next_speed() = 0;
+                m_sm->set_next_speed(cur_person, 0, -0.5);
                 cur_person->pass_door() = true;
             }
         }
         else
         {
-            cur_person->y_speed() = -(cur_person->y() - m_u_bound - person_radius);
-            cur_person->y_next_speed() = 0.1;
+            m_sm->set_speed(cur_person, cur_person->x_speed(), -(cur_person->y() - m_u_bound - person_radius));
+            m_sm->set_next_speed(cur_person, cur_person->y_next_speed(), 0.2);
         }
     }
     
@@ -140,15 +133,14 @@ void MapBlock::check_walls_collision(Person *cur_person, float person_radius, fl
         {
             if(!cur_person->pass_door() && cur_person->y_speed() > 0)
             {
-                cur_person->y_next_speed() = 0.5;
-                cur_person->x_next_speed() = 0;
+                m_sm->set_next_speed(cur_person, 0, 0.5);
                 cur_person->pass_door() = true;
             }
         }
         else
         {
-            cur_person->y_speed() = m_d_bound - cur_person->y() - person_radius;
-            cur_person->y_next_speed() = -0.2;
+            m_sm->set_speed(cur_person, cur_person->x_speed(), (m_d_bound - cur_person->y() - person_radius));
+            m_sm->set_next_speed(cur_person, cur_person->y_next_speed(), 0.2);
         }
     }
 }
@@ -260,14 +252,10 @@ void MapBlock::check_person_collision(size_t num)
             float collision_bound = (2 * m_people[i]->r()) * (2 * m_people[i]->r());
             if(distance < collision_bound)
             {
-                m_people[num]->x_speed() = 0;
-                m_people[num]->y_speed() = 0;
-                m_people[i]->x_speed() = 0;
-                m_people[i]->y_speed() = 0;
-                m_people[num]->x_next_speed() = m_people[num]->x_next_speed() + (cur_move_x_pos-move_x_pos) * 0.002;
-                m_people[num]->y_next_speed() = m_people[num]->y_next_speed() + (cur_move_y_pos-move_y_pos) * 0.002;
-                m_people[i]->x_next_speed() = m_people[i]->x_next_speed() + (move_x_pos-cur_move_x_pos) * 0.002;
-                m_people[i]->y_next_speed() = m_people[i]->y_next_speed() + (move_y_pos-cur_move_y_pos) * 0.002;
+                m_sm->reset_speed(m_people[i]);
+                m_sm->reset_speed(m_people[num]);
+                m_sm->set_stay_away_speed(m_people[i], m_people[num], move_x_pos-cur_move_x_pos, move_y_pos-cur_move_y_pos);
+
                 check_person_collision(i);
                 check_person_collision(num);
                 break;
@@ -342,107 +330,68 @@ void MapBlock::check_fire_collision(std::vector<Fire *>& fire)
 
 void MapBlock::get_min_door_distance(float x, float y, float &r_x_speed, float &r_y_speed)
 {
-    float l_door_x, l_door_y, r_door_x, r_door_y, u_door_x, u_door_y, d_door_x, d_door_y;
-    float l_distance, r_distance, u_distance, d_distance;
-    bool has_out_door = false;
+    float min_door_distance = std::numeric_limits<float>::max();
 
     // left door
     if(m_l_door)
     {
-        if(m_l_door->go_outside())
-            has_out_door = true;
-        l_door_x = m_l_door->r_bound() - 30;
-        l_door_y = (m_l_door->u_bound() + m_l_door->d_bound()) / 2;
-        l_distance = sqrt((x-l_door_x) * (x-l_door_x) + (y-l_door_y) * (y-l_door_y));
+        float l_door_x = m_l_door->r_bound() - 30;
+        float l_door_y = (m_l_door->u_bound() + m_l_door->d_bound()) / 2;
+        float l_distance = sqrt((x-l_door_x) * (x-l_door_x) + (y-l_door_y) * (y-l_door_y));
+            
+        if((m_has_out_door && m_l_door->go_outside() && (l_distance < min_door_distance))
+            || (!m_has_out_door && (l_distance < min_door_distance)))
+        {
+            min_door_distance = l_distance;
+            r_x_speed = l_door_x - x;
+            r_y_speed = l_door_y - y;
+        }      
     }
     
     // right door
     if(m_r_door)
     {
-        if(m_r_door->go_outside())
-            has_out_door = true;
-        r_door_x = m_r_door->l_bound() + 30;
-        r_door_y = (m_r_door->u_bound() + m_r_door->d_bound()) / 2;
-        r_distance = sqrt((x-r_door_x) * (x-r_door_x) + (y-r_door_y) * (y-r_door_y));
+        float r_door_x = m_r_door->l_bound() + 30;
+        float r_door_y = (m_r_door->u_bound() + m_r_door->d_bound()) / 2;
+        float r_distance = sqrt((x-r_door_x) * (x-r_door_x) + (y-r_door_y) * (y-r_door_y));
+        if((m_has_out_door && m_r_door->go_outside() && (r_distance < min_door_distance))
+           || (!m_has_out_door && (r_distance < min_door_distance)))
+        {
+            min_door_distance = r_distance;
+            r_x_speed = r_door_x - x;
+            r_y_speed = r_door_y - y;
+        }      
     }
     
     // up door
     if(m_u_door)
     {
-        if(m_u_door->go_outside())
-            has_out_door = true;
-        u_door_x = (m_u_door->l_bound() + m_u_door->r_bound()) / 2;
-        u_door_y = m_u_door->d_bound() - 30;
-        u_distance = sqrt((x-u_door_x) * (x-u_door_x) + (y-u_door_y) * (y-u_door_y));
+        float u_door_x = (m_u_door->l_bound() + m_u_door->r_bound()) / 2;
+        float u_door_y = m_u_door->d_bound() - 30;
+        float u_distance = sqrt((x-u_door_x) * (x-u_door_x) + (y-u_door_y) * (y-u_door_y));
+        if((m_has_out_door && m_u_door->go_outside() && (u_distance < min_door_distance))
+           || (!m_has_out_door && (u_distance < min_door_distance)))
+        {
+            min_door_distance = u_distance;
+            r_x_speed = u_door_x - x;
+            r_y_speed = u_door_y - y;
+        }      
     }
     
     // down door
     if(m_d_door)
     {
-        if(m_d_door->go_outside())
-            has_out_door = true;
-        d_door_x = (m_d_door->l_bound() + m_d_door->r_bound()) / 2;
-        d_door_y = m_d_door->u_bound() + 30;
-        d_distance = sqrt((x-d_door_x) * (x-d_door_x) + (y-d_door_y) * (y-d_door_y));
-    }
-    
-    if(has_out_door)
-    {
-        float min_door_distance = std::numeric_limits<float>::max();
+        float d_door_x = (m_d_door->l_bound() + m_d_door->r_bound()) / 2;
+        float d_door_y = m_d_door->u_bound() + 30;
+        float d_distance = sqrt((x-d_door_x) * (x-d_door_x) + (y-d_door_y) * (y-d_door_y));
         
-        if(m_l_door && m_l_door->go_outside() && (l_distance < min_door_distance))
-        {
-            min_door_distance = l_distance;
-            r_x_speed = l_door_x - x;
-            r_y_speed = l_door_y - y;
-        }
-        if(m_r_door && m_r_door->go_outside() && (r_distance < min_door_distance))
-        {
-            min_door_distance = r_distance;
-            r_x_speed = r_door_x - x;
-            r_y_speed = r_door_y - y;
-        }
-        if(m_u_door && m_u_door->go_outside() && (u_distance < min_door_distance))
-        {
-            min_door_distance = u_distance;
-            r_x_speed = u_door_x - x;
-            r_y_speed = u_door_y - y;
-        }
-        if(m_d_door && m_d_door->go_outside() && (d_distance < min_door_distance))
+        if((m_has_out_door && m_d_door->go_outside() && (d_distance < min_door_distance))
+           || (!m_has_out_door && (d_distance < min_door_distance)))
         {
             min_door_distance = d_distance;
             r_x_speed = d_door_x - x;
             r_y_speed = d_door_y - y;
-        }
-    }
-    else
-    {
-        float min_door_distance = std::numeric_limits<float>::max();
-        
-        if(m_l_door && (l_distance < min_door_distance))
-        {
-            min_door_distance = l_distance;
-            r_x_speed = l_door_x - x;
-            r_y_speed = l_door_y - y;
-        }
-        if(m_r_door && (r_distance < min_door_distance))
-        {
-            min_door_distance = r_distance;
-            r_x_speed = r_door_x - x;
-            r_y_speed = r_door_y - y;
-        }
-        if(m_u_door && (u_distance < min_door_distance))
-        {
-            min_door_distance = u_distance;
-            r_x_speed = u_door_x - x;
-            r_y_speed = u_door_y - y;
-        }
-        if(m_d_door && (d_distance < min_door_distance))
-        {
-            min_door_distance = d_distance;
-            r_x_speed = d_door_x - x;
-            r_y_speed = d_door_y - y;
-        }
+        }    
     }
 }
 
@@ -452,51 +401,16 @@ void MapBlock::update_people_speed()
     {    
         if(m_people[i]->pass_door())
         {
-            // If the people are passing the door, don't give them other speed
-            // So they can pass the door smoothly
-            m_people[i]->x_speed() = m_people[i]->x_next_speed();
-            m_people[i]->y_speed() = m_people[i]->y_next_speed();
+            m_sm->update_speed_in_door(m_people[i]);
         }    
         else 
         {
             float x_speed_to_door, y_speed_to_door;
             get_min_door_distance(m_people[i]->x(), m_people[i]->y(), x_speed_to_door, y_speed_to_door);
-
-            if(m_people[i]->panic_degree() == 5)
-            {
-                m_people[i]->x_speed() = 0.4 * rand() / (RAND_MAX + 1.0) - 0.2;
-                m_people[i]->y_speed() = 0.4 * rand() / (RAND_MAX + 1.0) - 0.2;
-            }
-            else if(m_people[i]->panic_degree() == 4)
-            {
-                m_people[i]->x_speed() = m_people[i]->x_next_speed() + 0.03 * x_speed_to_door;
-                m_people[i]->y_speed() = m_people[i]->y_next_speed() + 0.03 * y_speed_to_door;
-            }
-            else if(m_people[i]->panic_degree() == 3)
-            {
-                m_people[i]->x_speed() = m_people[i]->x_next_speed() + 0.1 * m_average_x + 0.01 * x_speed_to_door;
-                m_people[i]->y_speed() = m_people[i]->y_next_speed() + 0.1 * m_average_y + 0.01 * y_speed_to_door;
-            }
-            else if(m_people[i]->panic_degree() == 2)
-            {
-                m_people[i]->x_speed() = m_people[i]->x_next_speed() + 0.25 * m_average_x + 0.005 * x_speed_to_door;
-                m_people[i]->y_speed() = m_people[i]->y_next_speed() + 0.25 * m_average_y + 0.005 * y_speed_to_door;
-            }
-            else if(m_people[i]->panic_degree() == 1)
-            {
-                m_people[i]->x_speed() = m_people[i]->x_next_speed() + 0.4 * m_average_x + 0.001 * x_speed_to_door;
-                m_people[i]->y_speed() = m_people[i]->y_next_speed() + 0.4 * m_average_y + 0.001 * y_speed_to_door;
-            }
-            else
-            {
-                m_people[i]->x_speed() = m_people[i]->x_next_speed() + 0.5 * m_average_x;
-                m_people[i]->y_speed() = m_people[i]->y_next_speed() + 0.5 * m_average_y;
-            }
+            m_sm->update_speed_by_panic_degree(m_people[i], x_speed_to_door, y_speed_to_door);
         }
 
-        // update the average moving speed in a block
-        m_average_x = 0.95 * m_average_x + 0.05 * m_people[i]->x_speed();
-        m_average_y = 0.95 * m_average_y + 0.05 * m_people[i]->y_speed();
+        m_sm->update_block_speed(m_people[i]);
     }
 }
 
@@ -510,7 +424,7 @@ void MapBlock::people_move()
 
 void MapBlock::update_map_block(std::vector<Fire *>& fire, uint32_t count)
 {   
-    if(count > 1000)
+    if(count > 500)
         check_fire_collision(fire);
         
     check_move_collision();
