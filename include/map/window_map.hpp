@@ -1,4 +1,5 @@
 #include "map/map_block.hpp"
+#include "object/wall.hpp"
 
 #include <SDL2/SDL.h>
 #include <stdint.h> 
@@ -30,12 +31,13 @@ public:
 private:
     SDL_Renderer* m_gRenderer;
     SDL_Window* m_gWindow;
-    std::vector<SDL_Rect> m_walls;
+
     MapBlock *lu_block;
     MapBlock *ld_block;
     MapBlock *ru_block;
     MapBlock *rd_block;
     MapBlock *outside_block;
+    Wall *m_walls;
 
     std::vector<Fire *> m_fire;
     uint32_t m_count;

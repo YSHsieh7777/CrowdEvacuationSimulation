@@ -64,68 +64,7 @@ WindowMap::~WindowMap()
 
 void WindowMap::init_walls()
 {
-    m_walls = std::vector<SDL_Rect>(12);
-
-    // Draw the walls in a brute way
-    m_walls[0].x = 50;
-    m_walls[0].y = 50;
-    m_walls[0].w = 490;
-    m_walls[0].h = 30;
-
-    m_walls[1].x = 50;
-    m_walls[1].y = 280;
-    m_walls[1].w = 110;
-    m_walls[1].h = 30;
-
-    m_walls[2].x = 200;
-    m_walls[2].y = 280;
-    m_walls[2].w = 190;
-    m_walls[2].h = 30;
-
-    m_walls[3].x = 430;
-    m_walls[3].y = 280;
-    m_walls[3].w = 110;
-    m_walls[3].h = 30;
-
-    m_walls[4].x = 50;
-    m_walls[4].y = 510;
-    m_walls[4].w = 340;
-    m_walls[4].h = 30;
-
-    m_walls[5].x = 430;
-    m_walls[5].y = 510;
-    m_walls[5].w = 110;
-    m_walls[5].h = 30;
-
-    m_walls[6].x = 50;
-    m_walls[6].y = 50;
-    m_walls[6].w = 30;
-    m_walls[6].h = 110;
-
-    m_walls[7].x = 50;
-    m_walls[7].y = 200;
-    m_walls[7].w = 30;
-    m_walls[7].h = 340;
-
-    m_walls[8].x = 280;
-    m_walls[8].y = 50;
-    m_walls[8].w = 30;
-    m_walls[8].h = 110;
-
-    m_walls[9].x = 280;
-    m_walls[9].y = 200;
-    m_walls[9].w = 30;
-    m_walls[9].h = 190;
-
-    m_walls[10].x = 280;
-    m_walls[10].y = 430;
-    m_walls[10].w = 30;
-    m_walls[10].h = 110;
-
-    m_walls[11].x = 510;
-    m_walls[11].y = 50;
-    m_walls[11].w = 30;
-    m_walls[11].h = 490;
+    m_walls = new Wall();
 }
 
 void WindowMap::init_map_block()
@@ -181,6 +120,7 @@ void WindowMap::delete_map()
     delete outside_block;
     delete m_fire[0];
     delete m_fire[1];
+    delete m_walls;
 }
 
 void WindowMap::update_blocks()
@@ -209,7 +149,7 @@ void WindowMap::render_people()
 void WindowMap::update_fire()
 {
     // Update fire and check if the people is killed by fire
-    if(m_count > 500)
+    if(m_count > 250)
     {
         for(size_t i=0; i<2; ++i)
         {
@@ -233,18 +173,13 @@ void WindowMap::render_fire()
 void WindowMap::clear_screen()
 {
     // Clear screen
-    SDL_SetRenderDrawColor( m_gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-    SDL_RenderClear( m_gRenderer );
+    SDL_SetRenderDrawColor(m_gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+    SDL_RenderClear(m_gRenderer );
 }
 
 void WindowMap::render_walls()
 {
-    // Render wall
-    SDL_SetRenderDrawColor( m_gRenderer, 0x00, 0x00, 0x00, 0xFF );
-    for(int i=0; i<12; i++)
-    {
-        SDL_RenderDrawRect( m_gRenderer, &m_walls[i] );
-    }    
+    m_walls->render(m_gRenderer);
 }
 
 bool WindowMap::update_screen()

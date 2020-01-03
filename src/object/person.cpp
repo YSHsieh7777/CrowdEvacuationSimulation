@@ -50,14 +50,9 @@ void Person::move()
     m_y += m_y_speed;
 }
 
-void Person::setColor(SDL_Renderer* gRenderer)
-{
-    SDL_SetRenderDrawColor(gRenderer, panic_to_red[m_panic_degree], 0, 0, 0xFF);
-}
-
 void Person::render(SDL_Renderer* gRenderer)
 {
-    Person::setColor(gRenderer);
+    setColor(gRenderer, panic_to_red[m_panic_degree], 0, 0);
 
     const float diameter = (m_radius * 2);
 

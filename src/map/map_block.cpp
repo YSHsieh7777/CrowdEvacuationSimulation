@@ -338,14 +338,17 @@ void MapBlock::get_min_door_distance(float x, float y, float &r_x_speed, float &
         float l_door_x = m_l_door->r_bound() - 30;
         float l_door_y = (m_l_door->u_bound() + m_l_door->d_bound()) / 2;
         float l_distance = sqrt((x-l_door_x) * (x-l_door_x) + (y-l_door_y) * (y-l_door_y));
-            
-        if((m_has_out_door && m_l_door->go_outside() && (l_distance < min_door_distance))
-            || (!m_has_out_door && (l_distance < min_door_distance)))
+
+        if(l_distance < min_door_distance)
         {
-            min_door_distance = l_distance;
-            r_x_speed = l_door_x - x;
-            r_y_speed = l_door_y - y;
-        }      
+            if((m_has_out_door && m_l_door->go_outside())
+                || (!m_has_out_door))
+            {
+                min_door_distance = l_distance;
+                r_x_speed = l_door_x - x;
+                r_y_speed = l_door_y - y;
+            }      
+        }
     }
     
     // right door
@@ -354,13 +357,17 @@ void MapBlock::get_min_door_distance(float x, float y, float &r_x_speed, float &
         float r_door_x = m_r_door->l_bound() + 30;
         float r_door_y = (m_r_door->u_bound() + m_r_door->d_bound()) / 2;
         float r_distance = sqrt((x-r_door_x) * (x-r_door_x) + (y-r_door_y) * (y-r_door_y));
-        if((m_has_out_door && m_r_door->go_outside() && (r_distance < min_door_distance))
-           || (!m_has_out_door && (r_distance < min_door_distance)))
+        
+        if(r_distance < min_door_distance)
         {
-            min_door_distance = r_distance;
-            r_x_speed = r_door_x - x;
-            r_y_speed = r_door_y - y;
-        }      
+            if((m_has_out_door && m_r_door->go_outside())
+                || (!m_has_out_door))
+            {
+                min_door_distance = r_distance;
+                r_x_speed = r_door_x - x;
+                r_y_speed = r_door_y - y;
+            }    
+        }   
     }
     
     // up door
@@ -369,13 +376,17 @@ void MapBlock::get_min_door_distance(float x, float y, float &r_x_speed, float &
         float u_door_x = (m_u_door->l_bound() + m_u_door->r_bound()) / 2;
         float u_door_y = m_u_door->d_bound() - 30;
         float u_distance = sqrt((x-u_door_x) * (x-u_door_x) + (y-u_door_y) * (y-u_door_y));
-        if((m_has_out_door && m_u_door->go_outside() && (u_distance < min_door_distance))
-           || (!m_has_out_door && (u_distance < min_door_distance)))
+        
+        if(u_distance < min_door_distance)
         {
-            min_door_distance = u_distance;
-            r_x_speed = u_door_x - x;
-            r_y_speed = u_door_y - y;
-        }      
+            if((m_has_out_door && m_u_door->go_outside())
+                || (!m_has_out_door))
+            {
+                min_door_distance = u_distance;
+                r_x_speed = u_door_x - x;
+                r_y_speed = u_door_y - y;
+            }  
+        }     
     }
     
     // down door
@@ -385,13 +396,17 @@ void MapBlock::get_min_door_distance(float x, float y, float &r_x_speed, float &
         float d_door_y = m_d_door->u_bound() + 30;
         float d_distance = sqrt((x-d_door_x) * (x-d_door_x) + (y-d_door_y) * (y-d_door_y));
         
-        if((m_has_out_door && m_d_door->go_outside() && (d_distance < min_door_distance))
-           || (!m_has_out_door && (d_distance < min_door_distance)))
+        if(d_distance < min_door_distance)
         {
-            min_door_distance = d_distance;
-            r_x_speed = d_door_x - x;
-            r_y_speed = d_door_y - y;
-        }    
+            if((m_has_out_door && m_d_door->go_outside())
+                || (!m_has_out_door))
+            {
+                min_door_distance = d_distance;
+                r_x_speed = d_door_x - x;
+                r_y_speed = d_door_y - y;
+            }   
+        }
+         
     }
 }
 
@@ -424,7 +439,7 @@ void MapBlock::people_move()
 
 void MapBlock::update_map_block(std::vector<Fire *>& fire, uint32_t count)
 {   
-    if(count > 500)
+    if(count > 250)
         check_fire_collision(fire);
         
     check_move_collision();

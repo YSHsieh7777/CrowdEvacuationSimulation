@@ -21,14 +21,9 @@ void Fire::update_radius()
     m_radius += m_speed;
 }
 
-void Fire::setColor(SDL_Renderer* gRenderer)
-{
-    SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 0xFF);
-}
-
 void Fire::render(SDL_Renderer* gRenderer)
 {
-    Fire::setColor(gRenderer);
+    setColor(gRenderer, 255, 0, 0);
 
     const float diameter = (m_radius * 2);
 

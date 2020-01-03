@@ -1,7 +1,9 @@
+#include "object/object.hpp"
+
 #include <stdint.h>
 #include <SDL2/SDL.h>
 
-class Person
+class Person final : Object
 {
 public:
     Person(float , float , float );
@@ -30,10 +32,8 @@ public:
 
     void move();
 
-    void setColor(SDL_Renderer* );
-
     //Shows the Person on the screen
-    void render(SDL_Renderer* );
+    void render(SDL_Renderer* ) override;
 
 private:
     float m_x, m_y;

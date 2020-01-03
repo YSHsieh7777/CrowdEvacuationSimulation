@@ -1,6 +1,8 @@
+#include "object/object.hpp"
+
 #include <SDL2/SDL.h>
 
-class Fire
+class Fire final : public Object 
 {
 public:
     Fire(float x, float y , float r);
@@ -15,10 +17,8 @@ public:
 
     void update_radius();
 
-    void setColor(SDL_Renderer* );
-
-    //Shows the Person on the screen
-    void render(SDL_Renderer* );
+    //Shows the fire on the screen
+    void render(SDL_Renderer* ) override;
 
 private:
     float m_x, m_y;
