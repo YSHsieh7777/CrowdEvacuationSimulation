@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <SDL2/SDL.h>
 
-class Person final : Object
+class Person final : public Object
 {
 public:
     Person(float , float , float );
@@ -25,8 +25,6 @@ public:
     float & y_next_speed();
     const bool & pass_door() const;
     bool & pass_door();
-    const bool & is_dead() const;
-    bool & is_dead();
     const uint16_t & panic_degree() const;
     uint16_t & panic_degree();
 

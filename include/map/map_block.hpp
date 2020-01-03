@@ -5,6 +5,24 @@
 #include <SDL2/SDL.h>
 #include <vector>
 
+#define cacl_two_dim_distance(a_x, a_y, b_x, b_y)  \
+    sqrt((a_x-b_x) * (a_x-b_x) + (a_y-b_y) * (a_y-b_y))
+
+#define cacl_one_dim_distance(a, b) \
+    a - b
+
+#define add_person_in_block(block, person) \
+    block->people().push_back(person); \
+    block->people_num() += 1;
+
+#define delete_person(people, num) \
+    people.pop_back(); \
+    num -= 1;
+
+#define cacl_pos(pos, speed) \
+    pos + speed
+    
+
 class MapBlock
 {
 public:
