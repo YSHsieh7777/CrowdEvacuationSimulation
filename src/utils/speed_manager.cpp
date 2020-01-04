@@ -9,8 +9,8 @@ SpeedManager::SpeedManager()
 
     // Init a random average speed in a block
     // People in the block will move depending on that speed
-    m_average_x = 0.4 * rand() / (RAND_MAX + 1.0) - 0.2;
-    m_average_y = 0.4 * rand() / (RAND_MAX + 1.0) - 0.2;   
+    m_average_x = 0.2 * rand() / (RAND_MAX + 1.0) - 0.1;
+    m_average_y = 0.2 * rand() / (RAND_MAX + 1.0) - 0.1;   
 }
 
 void SpeedManager::reset_speed(Person *cur_person)

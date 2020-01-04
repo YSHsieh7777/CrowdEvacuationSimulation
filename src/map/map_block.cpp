@@ -15,8 +15,6 @@ MapBlock::MapBlock(size_t l_bound, size_t r_bound, size_t u_bound,
                     m_l_door(l_door), m_r_door(r_door),
                     m_u_door(u_door), m_d_door(d_door), m_has_out_door(has_out_door) 
 {
-    m_people_num = x_people_num * y_people_num;
-
     for(uint8_t y=1; y<y_people_num+1; ++y)
     {
         for(uint8_t x=1; x<x_people_num+1; ++x)
@@ -35,13 +33,13 @@ MapBlock::MapBlock(size_t l_bound, size_t r_bound, size_t u_bound,
 
 MapBlock::~MapBlock()
 {
-    for(size_t i=0; i<m_people_num; ++i)
+    for(auto p: m_people)
     {
-        delete m_people[i];
+        delete p;
     }
-    for(size_t i=0; i<m_dead_people.size(); ++i)
+    for(auto p: m_dead_people)
     {
-        delete m_dead_people[i];
+        delete p;
     }
 
     delete m_l_door;
@@ -51,10 +49,8 @@ MapBlock::~MapBlock()
     delete m_sm;
 }
 
-const size_t & MapBlock::people_num() const { return m_people_num; }
-size_t & MapBlock::people_num() { return m_people_num; }
-const std::vector<Person* > & MapBlock::people() const { return m_people; }
-std::vector<Person *> & MapBlock::people() { return m_people; }
+const std::vector<Person* > & MapBlock::alive_people() const { return m_people; }
+std::vector<Person *> & MapBlock::alive_people() { return m_people; }
 
 void MapBlock::add_neighbors(MapBlock* l_neighbor, MapBlock* r_neighbor, MapBlock* u_neighbor, MapBlock* d_neighbor)
 {
@@ -157,7 +153,7 @@ bool MapBlock::check_move_to_other_block(Person *cur_person, float person_radius
         m_sm->set_speed(cur_person, 
                         cur_person->x_speed() - (cacl_one_dim_distance(move_r_bound, (m_r_bound+30))), 
                         cur_person->y_speed());
-        add_person_in_block(m_r_neighbor, cur_person)
+        add_person_in_block(m_r_neighbor, cur_person);
         return true;
     }
         
@@ -167,7 +163,7 @@ bool MapBlock::check_move_to_other_block(Person *cur_person, float person_radius
         m_sm->set_speed(cur_person, 
                         cur_person->x_speed() - (cacl_one_dim_distance(move_l_bound, (m_l_bound-30))),
                         cur_person->y_speed());
-        add_person_in_block(m_l_neighbor, cur_person)
+        add_person_in_block(m_l_neighbor, cur_person);
         return true;
     }
 
@@ -177,7 +173,7 @@ bool MapBlock::check_move_to_other_block(Person *cur_person, float person_radius
         m_sm->set_speed(cur_person, 
                         cur_person->x_speed(),
                         cur_person->y_speed() - (cacl_one_dim_distance(move_u_bound, (m_u_bound-30))));
-        add_person_in_block(m_u_neighbor, cur_person)
+        add_person_in_block(m_u_neighbor, cur_person);
         return true;
     }
 
@@ -187,7 +183,7 @@ bool MapBlock::check_move_to_other_block(Person *cur_person, float person_radius
         m_sm->set_speed(cur_person, 
                         cur_person->x_speed(),
                         cur_person->y_speed() - (cacl_one_dim_distance(move_d_bound, (m_d_bound+30))));
-        add_person_in_block(m_d_neighbor, cur_person)
+        add_person_in_block(m_d_neighbor, cur_person);
         return true;
     }
 
@@ -202,7 +198,7 @@ void MapBlock::delete_people_from_block(std::vector<size_t> &erase_id)
         for(size_t i=0; i<erase_id.size(); ++i)
         {
             m_people[erase_id[i]] = m_people.back();
-            delete_person(m_people, m_people_num)
+            delete_person(m_people);
         }
     }
 }
@@ -211,22 +207,25 @@ void MapBlock::check_move_collision()
 {
     std::vector<size_t> erase_id;
 
-    for(size_t i=0; i<m_people_num; ++i)
+    size_t id = -1;
+    for(auto cur_person: m_people)
     {
-        float move_x_pos = cacl_pos(m_people[i]->x(), m_people[i]->x_speed());
-        float move_y_pos = cacl_pos(m_people[i]->y(), m_people[i]->y_speed());
-        float person_radius = m_people[i]->r();
+        id++;
+        
+        float move_x_pos = cacl_pos(cur_person->x(), cur_person->x_speed());
+        float move_y_pos = cacl_pos(cur_person->y(), cur_person->y_speed());
+        float person_radius = cur_person->r();
         float move_l_bound = cacl_one_dim_distance(move_x_pos, person_radius);
         float move_r_bound = cacl_one_dim_distance(move_x_pos, (-person_radius));
         float move_u_bound = cacl_one_dim_distance(move_y_pos, person_radius);
         float move_d_bound = cacl_one_dim_distance(move_y_pos, (-person_radius));
 
-        check_walls_collision(m_people[i], person_radius, move_l_bound,
+        check_walls_collision(cur_person, person_radius, move_l_bound,
                               move_r_bound, move_u_bound, move_d_bound);
         if(check_move_to_other_block(
-                        m_people[i], person_radius, move_l_bound,
+                        cur_person, person_radius, move_l_bound,
                         move_r_bound, move_u_bound, move_d_bound))
-            erase_id.push_back(i);
+            erase_id.push_back(id);
     }
 
     delete_people_from_block(erase_id);
@@ -237,29 +236,32 @@ void MapBlock::check_person_collision(size_t num)
     float cur_move_x_pos = cacl_pos(m_people[num]->x(), m_people[num]->x_speed());
     float cur_move_y_pos = cacl_pos(m_people[num]->y(), m_people[num]->y_speed());
 
-    for(size_t i=0; i<m_people_num; ++i)
+    size_t id = -1;
+    for(auto cur_person: m_people)
     {
-        if(m_people[i]->pass_door())
+        id++;
+
+        if(cur_person->pass_door())
             continue;
 
-        float move_x_pos = cacl_pos(m_people[i]->x(), m_people[i]->x_speed());
-        float move_y_pos = cacl_pos(m_people[i]->y(), m_people[i]->y_speed());
+        float move_x_pos = cacl_pos(cur_person->x(), cur_person->x_speed());
+        float move_y_pos = cacl_pos(cur_person->y(), cur_person->y_speed());
 
-        if(i == num)
+        if(id == num)
             continue;
         else
         {
             // If there's a collision, make the people stop, and give them a speed
             // to move away from each other. Then check the collision again.
             float distance = cacl_two_dim_distance(cur_move_x_pos, cur_move_y_pos, move_x_pos, move_y_pos);
-            float collision_bound = 2 * m_people[i]->r();
+            float collision_bound = 2 * cur_person->r();
             if(distance < collision_bound)
             {
-                m_sm->reset_speed(m_people[i]);
+                m_sm->reset_speed(cur_person);
                 m_sm->reset_speed(m_people[num]);
-                m_sm->set_stay_away_speed(m_people[i], m_people[num], move_x_pos-cur_move_x_pos, move_y_pos-cur_move_y_pos);
+                m_sm->set_stay_away_speed(cur_person, m_people[num], move_x_pos-cur_move_x_pos, move_y_pos-cur_move_y_pos);
 
-                check_person_collision(i);
+                check_person_collision(id);
                 check_person_collision(num);
                 break;
             }
@@ -269,14 +271,17 @@ void MapBlock::check_person_collision(size_t num)
 
 void MapBlock::check_people_collision()
 {
-    for(size_t i=0; i<m_people_num; ++i)
+    size_t id = -1;
+    for(auto cur_person: m_people)
     {
+        id++;
+
         // If the person is passing the door, don't check the collision
         // If checking the collision when the person is getting out of the door, there's a bug
         // This is a bug to fix
-        if(!m_people[i]->pass_door())
+        if(!cur_person->pass_door())
         {
-            check_person_collision(i);
+            check_person_collision(id);
         }     
     }
 }
@@ -305,24 +310,27 @@ void MapBlock::check_fire_collision(std::vector<Fire *>& fire)
         size_t y = fire[j]->y();
         size_t r = fire[j]->r();
 
-        for(size_t i=0; i<m_people_num; ++i)
+        size_t id = -1;
+        for(auto cur_person: m_people)
         {
-            float move_x_pos = cacl_pos(m_people[i]->x(), m_people[i]->x_speed());
-            float move_y_pos = cacl_pos(m_people[i]->y(), m_people[i]->y_speed());
+            id++;
+
+            float move_x_pos = cacl_pos(cur_person->x(), cur_person->x_speed());
+            float move_y_pos = cacl_pos(cur_person->y(), cur_person->y_speed());
 
             // If there's a collision, the person is dead
             float distance = cacl_two_dim_distance(x, y, move_x_pos, move_y_pos);
-            float collision_bound = m_people[i]->r() + r;
+            float collision_bound = cur_person->r() + r;
 
             if(distance < collision_bound)
             {
-                m_dead_people.push_back(m_people[i]);
-                erase_id.push_back(i);
+                m_dead_people.push_back(cur_person);
+                erase_id.push_back(id);
             }
             else
             {
                 float gap = cacl_one_dim_distance(distance, collision_bound);
-                update_person_panic_degree(m_people[i], gap);
+                update_person_panic_degree(cur_person, gap);
             }
         }
     }
@@ -414,28 +422,28 @@ void MapBlock::get_min_door_distance(float x, float y, float &r_x_speed, float &
 
 void MapBlock::update_people_speed()
 {    
-    for(size_t i=0; i<m_people_num; ++i)
+    for(auto cur_person: m_people)
     {    
-        if(m_people[i]->pass_door())
+        if(cur_person->pass_door())
         {
-            m_sm->update_speed_in_door(m_people[i]);
+            m_sm->update_speed_in_door(cur_person);
         }    
         else 
         {
             float x_speed_to_door, y_speed_to_door;
-            get_min_door_distance(m_people[i]->x(), m_people[i]->y(), x_speed_to_door, y_speed_to_door);
-            m_sm->update_speed_by_panic_degree(m_people[i], x_speed_to_door, y_speed_to_door);
+            get_min_door_distance(cur_person->x(), cur_person->y(), x_speed_to_door, y_speed_to_door);
+            m_sm->update_speed_by_panic_degree(cur_person, x_speed_to_door, y_speed_to_door);
         }
 
-        m_sm->update_block_speed(m_people[i]);
+        m_sm->update_block_speed(cur_person);
     }
 }
 
 void MapBlock::people_move()
 {
-    for(size_t i=0; i<m_people_num; ++i)
+    for(auto cur_person: m_people)
     {
-        m_people[i]->move();
+        cur_person->move();
     }
 }
 

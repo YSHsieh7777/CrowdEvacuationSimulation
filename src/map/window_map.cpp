@@ -118,9 +118,10 @@ void WindowMap::delete_map()
     delete ru_block;
     delete rd_block;
     delete outside_block;
-    delete m_fire[0];
-    delete m_fire[1];
     delete m_walls;
+
+    for(auto f: m_fire)
+        delete f;
 }
 
 void WindowMap::update_blocks()
@@ -135,14 +136,14 @@ void WindowMap::update_blocks()
 void WindowMap::render_people()
 {
     // Render each people in the four blocks
-    for(size_t i=0; i<lu_block->people_num(); ++i)
-        lu_block->people()[i]->render(m_gRenderer);
-    for(size_t i=0; i<ru_block->people_num(); ++i)
-        ru_block->people()[i]->render(m_gRenderer);
-    for(size_t i=0; i<ld_block->people_num(); ++i)
-        ld_block->people()[i]->render(m_gRenderer);
-    for(size_t i=0; i<rd_block->people_num(); ++i)
-        rd_block->people()[i]->render(m_gRenderer);
+    for(auto p: lu_block->alive_people())
+        p->render(m_gRenderer);
+    for(auto p: ru_block->alive_people())
+        p->render(m_gRenderer);
+    for(auto p: ld_block->alive_people())
+        p->render(m_gRenderer);
+    for(auto p: rd_block->alive_people())
+        p->render(m_gRenderer);
 }
 
 
@@ -199,8 +200,8 @@ bool WindowMap::update_screen()
 
 bool WindowMap::check_all_alive_indoor()
 {
-    if((lu_block->people_num() == 0) && (ld_block->people_num() == 0) && 
-        (ru_block->people_num() == 0) && (rd_block->people_num() == 0))
+    if((lu_block->alive_people().empty()) && (ld_block->alive_people().empty()) && 
+        (ru_block->alive_people().empty()) && (rd_block->alive_people().empty()))
         return false;
 
     return true;
@@ -208,5 +209,5 @@ bool WindowMap::check_all_alive_indoor()
 
 size_t WindowMap::get_alive_num()
 {
-    return outside_block->people_num();
+    return outside_block->alive_people().size();
 }

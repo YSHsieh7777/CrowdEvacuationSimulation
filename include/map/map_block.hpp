@@ -1,4 +1,4 @@
-#include "object/door.hpp"
+#include "utils/door.hpp"
 #include "object/fire.hpp"
 #include "utils/speed_manager.hpp"
 
@@ -12,12 +12,10 @@
     a - b
 
 #define add_person_in_block(block, person) \
-    block->people().push_back(person); \
-    block->people_num() += 1;
+    block->alive_people().push_back(person)
 
-#define delete_person(people, num) \
-    people.pop_back(); \
-    num -= 1;
+#define delete_person(people) \
+    people.pop_back()
 
 #define cacl_pos(pos, speed) \
     pos + speed
@@ -29,10 +27,8 @@ public:
     MapBlock(size_t , size_t , size_t , size_t , size_t , size_t , Door* , Door* , Door* , Door* , bool );
     ~MapBlock();
 
-    const size_t & people_num() const;
-    size_t & people_num();
-    const std::vector<Person* > & people() const;
-    std::vector<Person* > & people();
+    const std::vector<Person* > & alive_people() const;
+    std::vector<Person* > & alive_people();
 
     void add_neighbors(MapBlock* , MapBlock* , MapBlock* , MapBlock* );
 
@@ -60,8 +56,6 @@ private:
     size_t m_r_bound;
     size_t m_u_bound;
     size_t m_d_bound;
-
-    size_t m_people_num;
 
     Door* m_l_door;
     Door* m_r_door;

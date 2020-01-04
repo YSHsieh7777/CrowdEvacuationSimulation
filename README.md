@@ -8,6 +8,12 @@
 average fps = 400
 ```
 
+### Average FPS after Refactoring
+
+```
+average fps: 883.724
+```
+
 ## Cache Miss
 
 ### Cache Miss before Optimization
@@ -30,9 +36,29 @@ average fps = 400
 ==14167== LL miss rate:             0.0% (          0.0%     +           0.0%  )
 ```
 
+### Cache Miss after Refactoring
+
+```
+==22242== I   refs:      9,538,990,164
+==22242== I1  misses:       11,357,566
+==22242== LLi misses:           26,973
+==22242== I1  miss rate:          0.12%
+==22242== LLi miss rate:          0.00%
+==22242== 
+==22242== D   refs:      5,490,599,414  (3,854,929,098 rd   + 1,635,670,316 wr)
+==22242== D1  misses:       11,785,877  (    5,081,132 rd   +     6,704,745 wr)
+==22242== LLd misses:          270,907  (       94,622 rd   +       176,285 wr)
+==22242== D1  miss rate:           0.2% (          0.1%     +           0.4%  )
+==22242== LLd miss rate:           0.0% (          0.0%     +           0.0%  )
+==22242== 
+==22242== LL refs:          23,143,443  (   16,438,698 rd   +     6,704,745 wr)
+==22242== LL misses:           297,880  (      121,595 rd   +       176,285 wr)
+==22242== LL miss rate:            0.0% (          0.0%     +           0.0%  )
+```
+
 ## Memory Leak
 
-## Memory Leak before Optimization
+### Memory Leak before Optimization
 
 ```
 ==15896==
@@ -53,3 +79,16 @@ average fps = 400
 ==15896== Use --track-origins=yes to see where uninitialised values come from
 ==15896== ERROR SUMMARY: 10000000 errors from 667 contexts (suppressed: 0 from 0)
 ```
+
+## Memory Leak after Refactoring
+
+```
+==17328== LEAK SUMMARY:
+==17328==    definitely lost: 65 bytes in 3 blocks
+==17328==    indirectly lost: 528 bytes in 12 blocks
+==17328==      possibly lost: 0 bytes in 0 blocks
+==17328==    still reachable: 45,319 bytes in 495 blocks
+==17328==         suppressed: 0 bytes in 0 blocks
+```
+
+# Memory Leak after Fixing
