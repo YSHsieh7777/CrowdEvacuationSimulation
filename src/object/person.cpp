@@ -1,6 +1,7 @@
 #include "object/person.hpp"
 
 #include <map>
+#include <stdlib.h>
 
 std::map<uint16_t, uint16_t> panic_to_red = {{0, 0}, {1, 50}, {2, 100}, {3, 150}, {4, 200}, {5, 255}};
 

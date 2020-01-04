@@ -21,11 +21,11 @@ MapBlock::MapBlock(size_t l_bound, size_t r_bound, size_t u_bound,
     {
         for(uint8_t x=1; x<x_people_num+1; ++x)
         {    
-            // Init a person every 25 pixels and give him a random position in that block
-            float rand_x_pos = x*25 + (17.5 - 7.5) * rand() / (RAND_MAX + 1.0) + 7.5;
-            float rand_y_pos = y*25 + (17.5 - 7.5) * rand() / (RAND_MAX + 1.0) + 7.5;
+            // Init a person every 25 pixels
+            float x_pos = x*25 + 12.5;
+            float y_pos = y*25 + 12.5;
             
-            Person *p = new Person(m_l_bound + rand_x_pos, m_u_bound + rand_y_pos, 7.5);
+            Person *p = new Person(m_l_bound + x_pos, m_u_bound + y_pos, 7.5);
             m_people.push_back(p);
         }
     }
@@ -123,7 +123,7 @@ void MapBlock::check_walls_collision(Person *cur_person, float person_radius, fl
         else
         {
             m_sm->set_speed(cur_person, cur_person->x_speed(), -(cacl_one_dim_distance(cur_person->y(), (m_u_bound+person_radius))));
-            m_sm->set_next_speed(cur_person, cur_person->y_next_speed(), 0.4);
+            m_sm->set_next_speed(cur_person, cur_person->x_next_speed(), 0.4);
         }
     }
     
@@ -140,7 +140,7 @@ void MapBlock::check_walls_collision(Person *cur_person, float person_radius, fl
         else
         {
             m_sm->set_speed(cur_person, cur_person->x_speed(), cacl_one_dim_distance(m_d_bound, (cur_person->y()+person_radius)));
-            m_sm->set_next_speed(cur_person, cur_person->y_next_speed(), 0.4);
+            m_sm->set_next_speed(cur_person, cur_person->x_next_speed(), -0.4);
         }
     }
 }
@@ -289,9 +289,9 @@ void MapBlock::update_person_panic_degree(Person *cur_person, float gap)
         cur_person->panic_degree() = 4;
     else if(gap >= 60 && gap < 100 && cur_person->panic_degree() < 3)
         cur_person->panic_degree() = 3;
-    else if(gap >= 100 && gap < 140 && cur_person->panic_degree() < 2)
+    else if(gap >= 100 && gap < 150 && cur_person->panic_degree() < 2)
         cur_person->panic_degree() = 2;
-    else if(gap >= 140 && gap < 180 && cur_person->panic_degree() < 1)
+    else if(gap >= 150 && gap < 200 && cur_person->panic_degree() < 1)
         cur_person->panic_degree() = 1;
 }
 
