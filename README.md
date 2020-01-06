@@ -1,5 +1,24 @@
 # CrowdEvacuationSimulation
 
+## Prerequisite
+ - [SDL](https://www.libsdl.org/)
+ - [googletest](https://github.com/google/googletest)
+
+## Commands
+
+ - Start the simulation
+    ```
+    make run
+    ```
+ - Unittest
+    ```
+    make test
+    ```
+ - clear the intermediate products
+    ```
+    make clean
+    ```
+
 ## FPS
 
 ### Average FPS before Optimization
